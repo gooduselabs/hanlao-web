@@ -1,98 +1,50 @@
+You are building the personal Vietnamese fiction website "Hàn Lão Đọc Truyện" in this repo (~/Projects/hanlao-web) using GitHub Spec Kit (spec-driven development).
+
+IMPORTANT — HEADLESS / NON-INTERACTIVE MODE:
+You are running via `claude -p` with no human in the loop. Slash commands like /speckit.constitution will NOT be typed by a user. Instead, for EACH Spec Kit step below, READ the corresponding skill file under .claude/skills/speckit-*/SKILL.md (newer Spec Kit uses hyphenated skill names; if .claude/commands/speckit.*.md also exists, read those too) and EXECUTE that skill's instructions yourself end-to-end. Write all Spec Kit artifacts under specs/ (and .specify/memory as the skills require). Do not wait for confirmation between steps. Answer clarify questions yourself with sensible defaults that match the product brief.
+
+Execute Spec Kit steps IN THIS ORDER:
+1. /speckit-constitution (or /speckit.constitution) — establish project principles emphasizing: quality, beauty, accessibility, performance, Vietnamese-first UI/content, ONLY the author's own original stories (no multi-author marketplace, no user accounts), honest AI-assist disclosure in the footer.
+2. /speckit-specify — create the full specification covering ALL features and design requirements in docs/task-web-product.txt (and summarized below).
+3. /speckit-clarify — answer remaining ambiguities yourself sensibly (defaults: Astro static site, GitHub Pages primary with Cloudflare Pages compatible, series slug tan-dang-ky, Vietnamese locale, no auth).
+4. /speckit-plan — implementation plan: Astro static site, hostable free on GitHub Pages / Cloudflare Pages.
+5. /speckit-tasks — generate actionable tasks.
+6. /speckit-analyze — cross-artifact consistency check; fix gaps before coding.
+7. /speckit-implement — implement everything; commit at milestones locally.
+
+After Spec Kit implement completes (or as part of it):
+- `npm run build` must pass
+- Run local preview and capture Playwright (or similar) screenshots for home, series, and chapter pages at mobile + desktop; save under qa/
+- Write README.md with how to add a new story/episode and how to deploy
+- Write docs/web-progress.md with final status
+- Do NOT push or create remotes
+- Do NOT touch ~/Projects/han-lao except reading longform/ and channel/ for content sync (another Claude Code production run is active there — never kill it, never edit its files)
+
+======== PRODUCT BRIEF (also in docs/task-web-product.txt) ========
+
 Build a personal Vietnamese fiction website "Hàn Lão Đọc Truyện" for ONE author's own original stories only (no other authors, no user accounts).
 
-## Goal
-Static site (Astro preferred, or 11ty) so it can be hosted free on GitHub Pages / Cloudflare Pages. This is the author's personal reading site for original xianxia serials under the brand Hàn Lão Đọc Truyện. Do NOT write story content yourself — sync from existing markdown sources.
+Static site (Astro preferred, or 11ty) so it can be hosted free on GitHub Pages / Cloudflare Pages. Do NOT invent story content — sync from existing markdown sources.
 
-## Content source
-Markdown files live at: /Users/lab/Projects/han-lao/longform/hoiNNN.md (currently Hồi 1..22 exist; more will appear later).
+Content source: /Users/lab/Projects/han-lao/longform/hoiNNN.md (currently Hồi 1..22; more later).
 
-Each file has YAML front matter like:
----
-hoi: 1
-title: Đêm Đèn Tắt
-series: Tàn Đăng Ký
-next_title: ...
-yt_title: ...
-thumb_title: ...
-thumb_hook: ...
-summary: ...
----
-then Markdown body with ## Chương N headings. Body may contain production HTML comments such as:
-  <!-- scene: mountain -->
-  <!-- short1 --> ... <!-- /short1 -->
-  <!-- short2 --> ... <!-- /short2 -->
-Strip those comment markers (and any [pause], SFX tags, chapter timestamps if present) but KEEP all story prose inside them.
+YAML front matter fields include: hoi, title, series, next_title, yt_title, thumb_title, thumb_hook, summary. Body has ## Chương headings and production HTML comments such as <!-- scene: ... -->, <!-- short1 -->...<!-- /short1 -->, <!-- short2 -->...<!-- /short2 -->. Strip those comment markers (and any [pause], SFX tags, chapter timestamps if present) but KEEP all story prose.
 
-Write a small sync script invoked as `npm run sync` that:
-1. Copies/normalizes markdown from /Users/lab/Projects/han-lao/longform/hoi*.md into content/series/<slug>/...
-2. Strips production markup as above
-3. Maps front matter to: series, episode number (hoi), title, summary, YouTube link if known
-4. Supports multiple series in the future under content/series/<slug>/
+Write `npm run sync` that copies/normalizes markdown into content/series/<slug>/..., strips production markup, maps front matter to: series, episode number, title, summary, YouTube link if known. Support multiple series in the future under content/series/<slug>/.
 
-Series slug for this work: tan-dang-ky (full title: "Tàn Đăng Ký — Ngọn Đèn Không Tắt").
+Series slug: tan-dang-ky. Full title: "Tàn Đăng Ký — Ngọn Đèn Không Tắt".
 
-## YouTube mapping
-Create data/youtube.json (or read it) with:
+YouTube ids: read/create data/youtube.json with
 {"1":"Gd1I-vNHMg8","2":"CfHdXcYEIVY","3":"C_iRKYe7FFM","4":"KzBKkKwPyW8","5":"Br5A7cUQB-M","6":"AT3UMqpAaLc","7":"ks-i0mFb_k4","8":"pD12G4hRqY4"}
+Channel: https://www.youtube.com/@hanlaodoctruyen
+Embed YouTube on chapter pages when a video id exists.
 
-Channel link: https://www.youtube.com/@hanlaodoctruyen
+Channel art: use /Users/lab/Projects/han-lao/channel if banner/avatar images exist; currently mostly about.md and intro.md — use those for About copy. If no images, clean typographic brand; do not invent fake photos of people.
 
-When a video id exists for an episode, embed the YouTube video on that chapter reading page.
+Pages: home (hero with author persona Hàn Lão, latest episodes, series list); series page (cover, synopsis, chapter list); chapter reading page (comfortable Vietnamese reading typography, adjustable font size, light/dark/sepia themes in localStorage, prev/next/TOC nav, reading progress in localStorage, embedded YouTube when available); about; RSS; sitemap; Vietnamese SEO meta + Open Graph; fast mobile-first.
 
-## Channel art
-If present, use art from /Users/lab/Projects/han-lao/channel (banner/avatar). Currently that folder mainly has about.md and intro.md — use those texts for About page copy if helpful. If no image assets exist, use a clean typographic brand treatment; do not invent fake photos of people.
+Footer: honest note that stories are original works of Hàn Lão, written with AI assistance.
 
-## Pages required
-1. Home: hero with author persona Hàn Lão, latest episodes, series list
-2. Series page: cover, synopsis, chapter list
-3. Chapter reading page: comfortable reading typography for Vietnamese, adjustable font size, light/dark/sepia themes saved in localStorage, prev/next/table-of-contents nav, reading progress remembered in localStorage, embedded YouTube when video id exists
-4. About page
-5. RSS feed
-6. Sitemap
-7. Good SEO meta + Open Graph in Vietnamese
-8. Fast and mobile-first
+Include GitHub Actions workflow for GitHub Pages deploy but do NOT push or create remotes.
 
-## Footer
-Honest note that stories are original works of Hàn Lão, written with AI assistance.
-
-## Deploy
-Include a GitHub Actions workflow for GitHub Pages deploy, but do NOT push or create remotes. Leave remote setup to the user.
-
-## QA
-- `npm run build` must pass
-- Run a local preview and verify pages with screenshots (Playwright or similar) for home, series, chapter — both mobile and desktop — save to qa/
-- Commit at milestones (git commits locally only)
-- Write README.md with how to add a new story/episode and how to deploy
-- When done, write docs/web-progress.md with status
-
-## Constraints
-- You are coding this on the Mac mini at ~/Projects/hanlao-web
-- Do NOT touch ~/Projects/han-lao except reading longform/ and channel/ for sync (another Claude Code production run is active there — do not kill it, do not edit its files, do not write into that repo)
-- Do not push to any remote
-- No secrets in files
-- Vietnamese diacritics must render correctly throughout
-
-## PRIORITY DESIGN UPDATE (mandatory — supersedes any darker default)
-
-The site must be VERY beautiful and polished.
-
-### Visual identity
-- Bright and vibrant colors by default (fresh, luminous palette). Prefer warm sunrise gradients, jade/teal and gold accents in a modern xianxia mood.
-- NOT dark/gloomy as the default theme — dark is only an optional reading mode.
-- Refined typography; subtle animations (tasteful, not distracting).
-- Beautiful cover/hero art: generate decorative SVG/CSS art if no channel images exist (no fake photos of people).
-
-### Modern reading mode (chapter page — critical)
-Provide a rich reading experience with:
-1. Multiple reading color themes: white, sepia/paper, mint green, soft blue, pink pastel, dark, night/AMOLED
-2. Font family choice (serif / sans)
-3. Font size, line height, and content width sliders
-4. Floating reading toolbar
-5. AUTO-SCROLL with play/pause and speed control; keyboard shortcuts; tap-to-pause on mobile
-6. Immersive full-screen mode
-7. Reading progress bar
-8. Remember last position (localStorage)
-9. Prev / next chapter navigation + table of contents
-10. Optional text-to-speech button using the browser Web Speech API with vi-VN voice as a bonus
-
-Persist reading preferences (theme, font, size, line height, width, scroll speed) in localStorage.
+When done: docs/web-progress.md with status.
