@@ -1,0 +1,74 @@
+---
+interface Props {
+  chapters: { id: string; text: string }[];
+  episodes: { n: number; title: string; href: string }[];
+  current: number;
+  seriesTitle: string;
+}
+const { chapters, episodes, current, seriesTitle } = Astro.props;
+const themes = [
+  ['light', 'Trắng'], ['sepia', 'Giấy'], ['mint', 'Bạc hà'], ['blue', 'Xanh dịu'],
+  ['pink', 'Hồng phấn'], ['dark', 'Tối'], ['night', 'Đêm'],
+];
+---
+<div class="r-toolbar" id="r-toolbar" hidden data-reader-ui>
+  <div class="r-bar" role="toolbar" aria-label="Công cụ đọc truyện">
+    <button type="button" class="r-btn" data-act="toc" aria-controls="r-toc" aria-expanded="false" title="Mục lục (M)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="lbl">Mục lục</span>
+    </button>
+    <button type="button" class="r-btn" data-act="settings" aria-controls="r-settings" aria-expanded="false" title="Tuỳ chỉnh hiển thị">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19 9 5l5 14M6 14h6M15 19l3-8 3 8M16 16.5h4"/></svg><span class="lbl">Hiển thị</span>
+    </button>
+    <span class="r-sep" aria-hidden="true"></span>
+    <button type="button" class="r-btn r-play" data-act="scroll" aria-pressed="false" title="Tự cuộn (S)">
+      <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/></svg>
+      <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor" stroke="none"/></svg>
+      <span class="lbl">Tự cuộn</span>
+    </button>
+    <button type="button" class="r-btn r-mini" data-act="slower" title="Chậm hơn (-)" aria-label="Giảm tốc độ cuộn">−</button>
+    <output class="r-speed" aria-live="polite" title="Tốc độ cuộn">3</output>
+    <button type="button" class="r-btn r-mini" data-act="faster" title="Nhanh hơn (+)" aria-label="Tăng tốc độ cuộn">+</button>
+    <span class="r-sep" aria-hidden="true"></span>
+    <button type="button" class="r-btn" data-act="tts" aria-pressed="false" title="Nghe đọc (giọng Việt)" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><span class="lbl">Nghe</span>
+    </button>
+    <button type="button" class="r-btn" data-act="immersive" aria-pressed="false" title="Toàn màn hình (F)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Tập trung</span>
+    </button>
+  </div>
+
+  <section class="r-panel" id="r-settings" hidden aria-label="Tuỳ chỉnh hiển thị">
+    <div class="r-panel-head"><h2>Hiển thị</h2><button type="button" class="r-x" data-act="close" aria-label="Đóng">×</button></div>
+    <fieldset class="r-themes">
+      <legend>Màu nền</legend>
+      {themes.map(([v, l]) => (
+        <label class={`sw sw-${v}`}><input type="radio" name="r-theme" value={v} /><span class="dot" aria-hidden="true"></span><span>{l}</span></label>
+      ))}
+    </fieldset>
+    <fieldset class="r-fonts">
+      <legend>Kiểu chữ</legend>
+      <label><input type="radio" name="r-font" value="serif" /><span style="font-family:var(--font-serif)">Có chân</span></label>
+      <label><input type="radio" name="r-font" value="sans" /><span style="font-family:var(--font-sans)">Không chân</span></label>
+    </fieldset>
+    <label class="r-range">Cỡ chữ <output data-out="size"></output><input type="range" name="size" min="14" max="30" step="1" /></label>
+    <label class="r-range">Giãn dòng <output data-out="lineHeight"></output><input type="range" name="lineHeight" min="1.4" max="2.4" step="0.05" /></label>
+    <label class="r-range">Độ rộng <output data-out="width"></output><input type="range" name="width" min="480" max="960" step="20" /></label>
+    <label class="r-range">Tốc độ tự cuộn <output data-out="speed"></output><input type="range" name="speed" min="1" max="10" step="1" /></label>
+    <div class="r-row"><button type="button" class="r-reset" data-act="reset">Khôi phục mặc định</button></div>
+    <p class="r-keys">Phím tắt: <kbd>S</kbd> tự cuộn · <kbd>Space</kbd> dừng khi đang cuộn · <kbd>+</kbd>/<kbd>−</kbd> tốc độ · <kbd>←</kbd>/<kbd>→</kbd> chuyển hồi · <kbd>F</kbd> toàn màn hình · <kbd>M</kbd> mục lục · <kbd>Esc</kbd> đóng</p>
+  </section>
+
+  <section class="r-panel r-toc" id="r-toc" hidden aria-label="Mục lục">
+    <div class="r-panel-head"><h2>Mục lục</h2><button type="button" class="r-x" data-act="close" aria-label="Đóng">×</button></div>
+    <h3>Các chương trong hồi</h3>
+    <ol class="r-chapters">{chapters.map((c) => <li><a href={`#${c.id}`} data-chapter={c.id}>{c.text}</a></li>)}</ol>
+    <h3>{seriesTitle} — các hồi</h3>
+    <ol class="r-episodes">
+      {episodes.map((e) => <li><a href={e.href} aria-current={e.n === current ? 'page' : undefined}><b>{e.n}</b> {e.title}</a></li>)}
+    </ol>
+  </section>
+</div>
+<div class="r-toast" id="r-toast" role="status" hidden></div>
+<script>
+  import '../scripts/reader.ts';
+</script>

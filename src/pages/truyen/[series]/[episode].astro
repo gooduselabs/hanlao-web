@@ -1,0 +1,104 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import YouTubeFacade from '../../../components/YouTubeFacade.astro';
+import ReaderToolbar from '../../../components/ReaderToolbar.astro';
+import { allSeries, episodesOf, readingMinutes, type Episode, type Series } from '../../../lib/episodes';
+import { episodePath, seriesPath, url } from '../../../lib/site';
+import '../../../styles/reader.css';
+
+export async function getStaticPaths() {
+  const out = [];
+  for (const s of await allSeries()) {
+    const eps = await episodesOf(s.data.slug);
+    eps.forEach((ep, i) =>
+      out.push({
+        params: { series: s.data.slug, episode: `hoi-${ep.data.episode}` },
+        props: { s, ep, prev: eps[i - 1] ?? null, next: eps[i + 1] ?? null, all: eps },
+      }),
+    );
+  }
+  return out;
+}
+interface Props { s: Series; ep: Episode; prev: Episode | null; next: Episode | null; all: Episode[] }
+const { s, ep, prev, next, all } = Astro.props;
+const d = ep.data;
+const { Content, headings } = await render(ep);
+const chapters = headings.filter((h) => h.depth === 2);
+const minutes = readingMinutes(ep.body);
+const title = `Hồi ${d.episode}: ${d.title} — ${d.series}`;
+const pageUrl = new URL(episodePath(d.seriesSlug, d.episode), Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Chapter',
+  name: `Hồi ${d.episode}: ${d.title}`,
+  position: d.episode,
+  inLanguage: 'vi',
+  description: d.summary,
+  url: pageUrl,
+  author: { '@type': 'Person', name: 'Hàn Lão' },
+  isPartOf: { '@type': 'Book', name: s.data.fullTitle, url: new URL(seriesPath(d.seriesSlug), Astro.site).href },
+  ...(d.youtubeId ? { video: { '@type': 'VideoObject', name: d.ytTitle ?? title, embedUrl: `https://www.youtube.com/embed/${d.youtubeId}`, thumbnailUrl: `https://i.ytimg.com/vi/${d.youtubeId}/hqdefault.jpg`, uploadDate: d.updated, description: d.summary } } : {}),
+};
+---
+<BaseLayout title={title} description={d.summary || s.data.tagline} type="article" jsonLd={jsonLd} reader bodyClass="reader-page">
+  <div class="r-progress" aria-hidden="true"><span></span></div>
+  <article
+    class="reader"
+    data-series={d.seriesSlug}
+    data-episode={d.episode}
+    data-title={d.title}
+    data-url={episodePath(d.seriesSlug, d.episode)}
+    data-prev={prev ? episodePath(prev.data.seriesSlug, prev.data.episode) : ''}
+    data-next={next ? episodePath(next.data.seriesSlug, next.data.episode) : ''}
+  >
+    <header class="r-head">
+      <nav class="crumbs" aria-label="Đường dẫn">
+        <a href={url('/')}>Trang chủ</a> <span aria-hidden="true">›</span>
+        <a href={seriesPath(d.seriesSlug)}>{s.data.title}</a> <span aria-hidden="true">›</span>
+        <span aria-current="page">Hồi {d.episode}</span>
+      </nav>
+      <p class="r-kicker">{s.data.fullTitle}</p>
+      <h1><span class="r-num">Hồi {d.episode}</span>{d.title}</h1>
+      <p class="r-meta">
+        <span>{chapters.length} chương</span><span aria-hidden="true">·</span><span>~{minutes} phút đọc</span>
+        {d.youtubeId && <><span aria-hidden="true">·</span><span>có video</span></>}
+      </p>
+      {d.summary && <p class="r-summary">{d.summary}</p>}
+    </header>
+
+    {d.youtubeId && <YouTubeFacade id={d.youtubeId} title={d.ytTitle ?? title} />}
+
+    <details class="r-inline-toc">
+      <summary>Mục lục hồi này ({chapters.length} chương)</summary>
+      <ol>{chapters.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+    </details>
+
+    <div class="r-body" id="r-body">
+      <Content />
+    </div>
+
+    <p class="r-end" aria-hidden="true">❦</p>
+
+    <nav class="r-nav" aria-label="Chuyển hồi">
+      {prev ? (
+        <a class="r-nav-prev" href={episodePath(prev.data.seriesSlug, prev.data.episode)} rel="prev">
+          <small>← Hồi trước</small><span>Hồi {prev.data.episode}: {prev.data.title}</span>
+        </a>
+      ) : <span class="r-nav-prev is-disabled"><small>Đây là hồi đầu tiên</small><span>Chúc các con đọc vui</span></span>}
+      <a class="r-nav-toc" href={seriesPath(d.seriesSlug)}><small>Mục lục</small><span>{all.length} hồi</span></a>
+      {next ? (
+        <a class="r-nav-next" href={episodePath(next.data.seriesSlug, next.data.episode)} rel="next">
+          <small>Hồi sau →</small><span>Hồi {next.data.episode}: {next.data.title}</span>
+        </a>
+      ) : (
+        <span class="r-nav-next is-disabled">
+          <small>Hồi sau đang được chép</small>
+          <span>{d.nextTitle ? `Sắp tới: ${d.nextTitle}` : 'Hẹn các con hồi sau'}</span>
+        </span>
+      )}
+    </nav>
+  </article>
+
+  <ReaderToolbar chapters={chapters.map((h) => ({ id: h.slug, text: h.text }))} episodes={all.map((e) => ({ n: e.data.episode, title: e.data.title, href: episodePath(e.data.seriesSlug, e.data.episode) }))} current={d.episode} seriesTitle={s.data.title} />
+</BaseLayout>

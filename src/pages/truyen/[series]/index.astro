@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SeriesCover from '../../../components/SeriesCover.astro';
+import ContinueCard from '../../../components/ContinueCard.astro';
+import { allSeries, episodesOf, type Series } from '../../../lib/episodes';
+import { SITE, episodePath, url } from '../../../lib/site';
+
+export async function getStaticPaths() {
+  return (await allSeries()).map((s) => ({ params: { series: s.data.slug }, props: { s } }));
+}
+const { s } = Astro.props as { s: Series };
+const eps = await episodesOf(s.data.slug);
+const videos = eps.filter((e) => e.data.youtubeId).length;
+const subtitle = s.data.fullTitle.split('—')[1]?.trim() ?? '';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Book',
+  name: s.data.fullTitle,
+  inLanguage: 'vi',
+  author: { '@type': 'Person', name: 'Hàn Lão' },
+  genre: s.data.genre,
+  description: s.data.synopsis,
+  numberOfPages: eps.length,
+  url: new URL(url(`truyen/${s.data.slug}/`), Astro.site).href,
+};
+---
+<BaseLayout title={s.data.fullTitle} description={`${s.data.tagline} ${s.data.synopsis}`.slice(0, 300)} jsonLd={jsonLd}>
+  <section class="series-hero">
+    <div class="container wrap">
+      <div class="cover rise"><SeriesCover title={s.data.title} subtitle={subtitle} slug={s.data.slug} /></div>
+      <div class="rise rise-2">
+        <span class="eyebrow">Truyện nguyên tác · Hàn Lão kể</span>
+        <h1>{s.data.fullTitle}</h1>
+        {s.data.tagline && <p style="font-size:1.1rem;font-weight:600;color:var(--vermilion);margin:0 0 10px">{s.data.tagline}</p>}
+        <div class="stats">
+          {s.data.genre.map((g) => <span class="chip">{g}</span>)}
+          <span class="chip jade">{s.data.status}</span>
+          <span class="chip">{eps.length} hồi</span>
+          {videos > 0 && <span class="chip red">▶ {videos} hồi có video</span>}
+        </div>
+        <p class="synopsis">{s.data.synopsis}</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          {eps[0] && <a class="btn btn-primary" href={episodePath(s.data.slug, eps[0].data.episode)}>Đọc từ đầu</a>}
+          {eps.at(-1) && <a class="btn btn-ghost" href={episodePath(s.data.slug, eps.at(-1)!.data.episode)}>Hồi mới nhất</a>}
+          <a class="btn btn-ghost" href={s.data.youtubeChannel ?? SITE.youtube} target="_blank" rel="noopener">▶ Kênh YouTube</a>
+        </div>
+        <ContinueCard series={s.data.slug} />
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="toc-h">
+    <div class="container" style="max-width:880px">
+      <div class="section-head"><div><span class="eyebrow">Mục lục</span><h2 id="toc-h">Danh sách các hồi</h2></div></div>
+      <ol class="ep-list">
+        {eps.map((e) => (
+          <li>
+            <a href={episodePath(s.data.slug, e.data.episode)} data-progress-key={`${s.data.slug}/${e.data.episode}`}>
+              <span class="n" aria-hidden="true">{e.data.episode}</span>
+              <span>
+                <span class="t"><span class="sr-only">Hồi {e.data.episode}: </span>{e.data.title}</span>
+                {e.data.summary && <span class="s">{e.data.summary}</span>}
+              </span>
+              <span class="aside" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+                {e.data.youtubeId && <span class="chip red">▶ Video</span>}
+                <span class="chip jade read-mark" hidden>Đã đọc</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</BaseLayout>

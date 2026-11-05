@@ -1,0 +1,20 @@
+---
+import { SITE, url } from '../lib/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer" data-chrome>
+  <div class="container cols">
+    <div>
+      <p class="disclosure">
+        <strong>Lời thật lòng:</strong> {SITE.disclosure} Mọi nhân vật, địa danh và tình tiết đều là hư cấu.
+      </p>
+      <p>© {year} Hàn Lão Đọc Truyện · Truyện nguyên tác, vui lòng ghi nguồn khi chia sẻ.</p>
+    </div>
+    <nav aria-label="Liên kết chân trang">
+      <a href={url('truyen/')}>Danh sách truyện</a>
+      <a href={url('gioi-thieu/')}>Giới thiệu</a>
+      <a href={url('rss.xml')}>RSS</a>
+      <a href={SITE.youtube} rel="noopener" target="_blank">YouTube</a>
+    </nav>
+  </div>
+</footer>

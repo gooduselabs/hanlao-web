@@ -1,0 +1,29 @@
+---
+interface Props { id: string; title: string }
+const { id, title } = Astro.props;
+const watch = `https://www.youtube.com/watch?v=${id}`;
+---
+<figure class="yt-facade">
+  <a class="yt-btn" href={watch} data-yt-id={id} data-yt-title={title} target="_blank" rel="noopener">
+    <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" decoding="async" width="480" height="360" />
+    <span class="yt-play" aria-hidden="true">
+      <svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.3.3 34 .3 34 .3S12.7.3 7.4 1.7a8.5 8.5 0 0 0-6 6C0 13 0 24 0 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6c5.3 1.4 26.6 1.4 26.6 1.4s21.3 0 26.6-1.4a8.5 8.5 0 0 0 6-6C68 35 68 24 68 24s0-11-1.5-16.3Z" fill="#e8553d"/><path d="m27 34 18-10-18-10z" fill="#fff"/></svg>
+    </span>
+    <span class="sr-only">Xem video: {title}</span>
+  </a>
+  <figcaption>🎧 Nghe Hàn Lão kể hồi này trên YouTube — video chỉ tải khi bạn bấm phát.</figcaption>
+</figure>
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('a[data-yt-id]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${a.dataset.ytId}?autoplay=1&rel=0`;
+      f.title = a.dataset.ytTitle || 'YouTube';
+      f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      f.allowFullscreen = true;
+      f.loading = 'lazy';
+      a.replaceWith(f);
+    });
+  });
+</script>

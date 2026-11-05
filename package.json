@@ -23,5 +23,8 @@
   "private": true,
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.1"
   }
 }

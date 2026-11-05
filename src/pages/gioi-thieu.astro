@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandMark from '../components/BrandMark.astro';
+import about from '../../content/about.json';
+import { SITE, url } from '../lib/site';
+
+// Use only the reader-facing parts of the channel notes: the channel description and the intro narration.
+function section(md: string, heading: RegExp): string[] {
+  const m = md.split(/^##\s+/m).find((b) => heading.test(b.split('\n')[0]));
+  if (!m) return [];
+  return m.split('\n').slice(1).map((l) => l.replace(/\*\*/g, '').trim()).filter(Boolean);
+}
+const desc = section(about.aboutMd, /Mô tả kênh/);
+const intro = section(about.introMd, /Lời kể/);
+---
+<BaseLayout title="Giới thiệu" description="Hàn Lão là ai? Một ông lão mê truyện tiên hiệp, kể lại những câu chuyện nguyên tác cho các con nghe.">
+  <section class="page-head">
+    <div class="container" style="display:flex;gap:18px;align-items:center">
+      <BrandMark size={72} class="" />
+      <div><span class="eyebrow">Giới thiệu</span><h1 style="margin:0">Về Hàn Lão</h1></div>
+    </div>
+  </section>
+  <div class="container section" style="padding-top:24px">
+    <div class="prose">
+      {desc.map((p) => <p>{p}</p>)}
+      {intro.length > 0 && (
+        <>
+          <h2>Lời chào của lão</h2>
+          <blockquote>{intro.map((l) => <p style="margin:.3em 0">{l}</p>)}</blockquote>
+        </>
+      )}
+      <h2>Về trang này</h2>
+      <p>
+        Đây là thư phòng nhỏ của Hàn Lão, nơi các hồi truyện được chép lại đầy đủ để các con đọc thong thả. Không cần đăng ký tài khoản,
+        không quảng cáo. Tuỳ chỉnh màu nền, cỡ chữ, tự cuộn và cả nghe đọc đều được lưu ngay trên máy của các con.
+      </p>
+      <p><strong>Minh bạch:</strong> {SITE.disclosure}</p>
+      <p style="display:flex;gap:12px;flex-wrap:wrap;font-family:var(--font-sans)">
+        <a class="btn btn-primary" href={url('truyen/')}>Vào đọc truyện</a>
+        <a class="btn btn-ghost" href={SITE.youtube} target="_blank" rel="noopener">▶ Kênh YouTube @hanlaodoctruyen</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>

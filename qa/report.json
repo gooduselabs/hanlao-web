@@ -1,0 +1,26 @@
+{
+  "base": "http://localhost:4321",
+  "errors": [],
+  "checks": {
+    "home-mobile-noHorizontalOverflow": true,
+    "series-mobile-noHorizontalOverflow": true,
+    "chapter-mobile-noHorizontalOverflow": true,
+    "about-mobile-noHorizontalOverflow": true,
+    "prefs-persist-mobile": true,
+    "autoscroll-mobile": true,
+    "resume-toast-mobile": true,
+    "theme-after-reload-mobile": true,
+    "no-production-markup-mobile": true,
+    "youtube-facade-mobile": true,
+    "home-desktop-noHorizontalOverflow": true,
+    "series-desktop-noHorizontalOverflow": true,
+    "chapter-desktop-noHorizontalOverflow": true,
+    "about-desktop-noHorizontalOverflow": true,
+    "prefs-persist-desktop": true,
+    "autoscroll-desktop": true,
+    "resume-toast-desktop": true,
+    "theme-after-reload-desktop": true,
+    "no-production-markup-desktop": true,
+    "youtube-facade-desktop": true
+  }
+}

@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/site';
+---
+<BaseLayout title="Không tìm thấy trang">
+  <section class="page-head" style="text-align:center;padding:96px 0">
+    <div class="container">
+      <p style="font-size:3rem;margin:0">🏮</p>
+      <h1>Đèn tắt mất rồi…</h1>
+      <p>Trang các con tìm không có ở đây. Quay về để lão kể tiếp nhé.</p>
+      <a class="btn btn-primary" href={url('/')}>Về trang chủ</a>
+    </div>
+  </section>
+</BaseLayout>

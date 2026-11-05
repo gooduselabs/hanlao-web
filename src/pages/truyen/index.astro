@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SeriesCover from '../../components/SeriesCover.astro';
+import { allSeries, episodesOf } from '../../lib/episodes';
+import { seriesPath } from '../../lib/site';
+const list = await Promise.all((await allSeries()).map(async (s) => ({ s, n: (await episodesOf(s.data.slug)).length })));
+---
+<BaseLayout title="Danh sách truyện" description="Tất cả truyện tiên hiệp nguyên tác của Hàn Lão.">
+  <section class="page-head"><div class="container"><span class="eyebrow">Thư phòng</span><h1>Danh sách truyện</h1></div></section>
+  <div class="container section" style="padding-top:16px">
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+      {list.map(({ s, n }) => (
+        <a class="ep-card" href={seriesPath(s.data.slug)} style="padding:14px">
+          <SeriesCover title={s.data.title} slug={s.data.slug} subtitle="Ngọn Đèn Không Tắt" />
+          <h3>{s.data.fullTitle}</h3>
+          <span class="meta"><span class="chip">{n} hồi</span><span class="chip jade">{s.data.status}</span></span>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

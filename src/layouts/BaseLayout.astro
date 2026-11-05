@@ -1,0 +1,76 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE, url } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  jsonLd?: Record<string, unknown>;
+  bodyClass?: string;
+  reader?: boolean;
+}
+const { title, description = SITE.description, image, type = 'website', jsonLd, bodyClass = '', reader = false } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} — Truyện tiên hiệp nguyên tác`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image ?? url('og-default.png'), Astro.site);
+---
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#fff3dd" />
+    <meta name="author" content="Hàn Lão" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href={url('rss.xml')} />
+    <link rel="sitemap" href={url('sitemap-index.xml')} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title ?? SITE.name} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title ?? SITE.name} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap&subset=vietnamese"
+    />
+    {reader && (
+      <script is:inline>
+        // Apply saved reading prefs before paint to avoid a theme flash.
+        try {
+          var p = JSON.parse(localStorage.getItem('hanlao:prefs:v1') || '{}');
+          var d = document.documentElement;
+          if (p.theme) d.dataset.rtheme = p.theme;
+          if (p.font) d.dataset.rfont = p.font;
+          if (p.size) d.style.setProperty('--r-size', p.size + 'px');
+          if (p.lineHeight) d.style.setProperty('--r-lh', p.lineHeight);
+          if (p.width) d.style.setProperty('--r-width', p.width + 'px');
+        } catch (e) {}
+      </script>
+    )}
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body class={bodyClass}>
+    <a class="skip-link" href="#main">Bỏ qua tới nội dung</a>
+    <Header />
+    <main id="main"><slot /></main>
+    <Footer />
+  </body>
+</html>

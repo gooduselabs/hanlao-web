@@ -1,0 +1,23 @@
+---
+import BrandMark from './BrandMark.astro';
+import { SITE, url } from '../lib/site';
+const path = Astro.url.pathname;
+const is = (p: string) => (path === url(p) || (p !== '/' && path.startsWith(url(p)))) ? 'page' : undefined;
+---
+<header class="site-header" data-chrome>
+  <div class="container bar">
+    <a class="brand" href={url('/')} aria-label={`${SITE.name} — trang chủ`}>
+      <BrandMark />
+      <span class="brand-name">Hàn Lão<small>Đọc Truyện</small></span>
+    </a>
+    <nav class="nav" aria-label="Điều hướng chính">
+      <a href={url('/')} aria-current={is('/')}>Trang chủ</a>
+      <a class="keep" href={url('truyen/')} aria-current={is('truyen/')}>Truyện</a>
+      <a href={url('gioi-thieu/')} aria-current={is('gioi-thieu/')}>Giới thiệu</a>
+      <a class="yt" href={SITE.youtube} rel="noopener" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1c.4-1.6.5-4.8.5-4.8s0-3.2-.5-4.8ZM9.7 15.1V8.9l5.8 3.1-5.8 3.1Z"/></svg>
+        <span>Kênh</span><span class="sr-only"> YouTube (mở tab mới)</span>
+      </a>
+    </nav>
+  </div>
+</header>

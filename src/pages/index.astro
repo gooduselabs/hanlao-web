@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroArt from '../components/HeroArt.astro';
+import SeriesCover from '../components/SeriesCover.astro';
+import EpisodeCard from '../components/EpisodeCard.astro';
+import ContinueCard from '../components/ContinueCard.astro';
+import { allSeries, episodesOf, latestEpisodes } from '../lib/episodes';
+import { SITE, url, seriesPath, episodePath } from '../lib/site';
+
+const series = await allSeries();
+const seriesInfo = await Promise.all(series.map(async (s) => ({ s, eps: await episodesOf(s.data.slug) })));
+const latest = await latestEpisodes(6);
+const first = seriesInfo[0];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.name,
+  inLanguage: 'vi',
+  url: new URL(url('/'), Astro.site).href,
+  author: { '@type': 'Person', name: 'Hàn Lão' },
+};
+---
+<BaseLayout jsonLd={jsonLd}>
+  <section class="hero">
+    <div class="container hero-inner">
+      <div>
+        <p class="kicker rise">Truyện tiên hiệp nguyên tác</p>
+        <h1 class="rise rise-2">Lão kể,<br />các con nghe.</h1>
+        <p class="lead rise rise-3">
+          Lão là <strong>Hàn Lão</strong>. Cả đời mê truyện tiên hiệp, giờ tóc bạc rồi, lão ngồi kể lại cho các con nghe —
+          chuyện có đèn, có núi, có người thương. Ở đây các con đọc trọn từng hồi, chậm rãi, theo cách mình thích.
+        </p>
+        <div class="actions rise rise-3">
+          {first && first.eps[0] && (
+            <a class="btn btn-primary" href={episodePath(first.s.data.slug, first.eps[0].data.episode)}>Đọc từ Hồi 1 →</a>
+          )}
+          {first && <a class="btn btn-ghost" href={seriesPath(first.s.data.slug)}>Mục lục {first.s.data.title}</a>}
+          <a class="btn btn-ghost" href={SITE.youtube} target="_blank" rel="noopener">▶ Nghe trên YouTube</a>
+        </div>
+        <ContinueCard />
+      </div>
+      <div class="hero-art rise rise-2"><HeroArt /></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="latest-h">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Mới cập nhật</span>
+          <h2 id="latest-h">Những hồi mới nhất</h2>
+        </div>
+        {first && <a href={seriesPath(first.s.data.slug)}>Xem tất cả →</a>}
+      </div>
+      <div class="grid">
+        {latest.map((ep) => <EpisodeCard ep={ep} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="series-h" style="padding-top:8px">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Bộ truyện</span>
+          <h2 id="series-h">Truyện của Hàn Lão</h2>
+        </div>
+      </div>
+      {seriesInfo.map(({ s, eps }) => (
+        <article class="series-card">
+          <a class="cover" href={seriesPath(s.data.slug)} tabindex="-1" aria-hidden="true">
+            <SeriesCover title={s.data.title} subtitle="Ngọn Đèn Không Tắt" slug={s.data.slug} />
+          </a>
+          <div>
+            <div class="stats">
+              {s.data.genre.map((g) => <span class="chip">{g}</span>)}
+              <span class="chip jade">{s.data.status}</span>
+              <span class="chip">{eps.length} hồi</span>
+            </div>
+            <h3><a href={seriesPath(s.data.slug)} style="color:inherit;text-decoration:none">{s.data.fullTitle}</a></h3>
+            <p style="font-family:var(--font-serif);color:var(--ink-soft);line-height:1.8">{s.data.synopsis}</p>
+            <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap">
+              {eps[0] && <a class="btn btn-primary" href={episodePath(s.data.slug, eps[0].data.episode)}>Bắt đầu đọc</a>}
+              <a class="btn btn-ghost" href={seriesPath(s.data.slug)}>Danh sách {eps.length} hồi</a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
