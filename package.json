@@ -23,7 +23,7 @@
   },
   "private": true,
   "engines": {
-    "node": ">=20"
+    "node": ">=22.23.4"
   },
   "devDependencies": {
     "playwright": "^1.49.1"
