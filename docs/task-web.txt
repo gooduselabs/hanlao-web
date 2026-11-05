@@ -1,0 +1,73 @@
+Build a personal Vietnamese fiction website "Hàn Lão Đọc Truyện" for ONE author's own original stories only (no other authors, no user accounts).
+
+## Goal
+Static site (Astro preferred, or 11ty) so it can be hosted free on GitHub Pages / Cloudflare Pages. This is the author's personal reading site for original xianxia serials under the brand Hàn Lão Đọc Truyện. Do NOT write story content yourself — sync from existing markdown sources.
+
+## Content source
+Markdown files live at: /Users/lab/Projects/han-lao/longform/hoiNNN.md (currently Hồi 1..22 exist; more will appear later).
+
+Each file has YAML front matter like:
+---
+hoi: 1
+title: Đêm Đèn Tắt
+series: Tàn Đăng Ký
+next_title: ...
+yt_title: ...
+thumb_title: ...
+thumb_hook: ...
+summary: ...
+---
+then Markdown body with ## Chương N headings. Body may contain production HTML comments such as:
+  <!-- scene: mountain -->
+  <!-- short1 --> ... <!-- /short1 -->
+  <!-- short2 --> ... <!-- /short2 -->
+Strip those comment markers (and any [pause], SFX tags, chapter timestamps if present) but KEEP all story prose inside them.
+
+Write a small sync script invoked as `npm run sync` that:
+1. Copies/normalizes markdown from /Users/lab/Projects/han-lao/longform/hoi*.md into content/series/<slug>/...
+2. Strips production markup as above
+3. Maps front matter to: series, episode number (hoi), title, summary, YouTube link if known
+4. Supports multiple series in the future under content/series/<slug>/
+
+Series slug for this work: tan-dang-ky (full title: "Tàn Đăng Ký — Ngọn Đèn Không Tắt").
+
+## YouTube mapping
+Create data/youtube.json (or read it) with:
+{"1":"Gd1I-vNHMg8","2":"CfHdXcYEIVY","3":"C_iRKYe7FFM","4":"KzBKkKwPyW8","5":"Br5A7cUQB-M","6":"AT3UMqpAaLc","7":"ks-i0mFb_k4","8":"pD12G4hRqY4"}
+
+Channel link: https://www.youtube.com/@hanlaodoctruyen
+
+When a video id exists for an episode, embed the YouTube video on that chapter reading page.
+
+## Channel art
+If present, use art from /Users/lab/Projects/han-lao/channel (banner/avatar). Currently that folder mainly has about.md and intro.md — use those texts for About page copy if helpful. If no image assets exist, use a clean typographic brand treatment; do not invent fake photos of people.
+
+## Pages required
+1. Home: hero with author persona Hàn Lão, latest episodes, series list
+2. Series page: cover, synopsis, chapter list
+3. Chapter reading page: comfortable reading typography for Vietnamese, adjustable font size, light/dark/sepia themes saved in localStorage, prev/next/table-of-contents nav, reading progress remembered in localStorage, embedded YouTube when video id exists
+4. About page
+5. RSS feed
+6. Sitemap
+7. Good SEO meta + Open Graph in Vietnamese
+8. Fast and mobile-first
+
+## Footer
+Honest note that stories are original works of Hàn Lão, written with AI assistance.
+
+## Deploy
+Include a GitHub Actions workflow for GitHub Pages deploy, but do NOT push or create remotes. Leave remote setup to the user.
+
+## QA
+- `npm run build` must pass
+- Run a local preview and verify pages with screenshots (Playwright or similar) for home, series, chapter — both mobile and desktop — save to qa/
+- Commit at milestones (git commits locally only)
+- Write README.md with how to add a new story/episode and how to deploy
+- When done, write docs/web-progress.md with status
+
+## Constraints
+- You are coding this on the Mac mini at ~/Projects/hanlao-web
+- Do NOT touch ~/Projects/han-lao except reading longform/ and channel/ for sync (another Claude Code production run is active there — do not kill it, do not edit its files, do not write into that repo)
+- Do not push to any remote
+- No secrets in files
+- Vietnamese diacritics must render correctly throughout
