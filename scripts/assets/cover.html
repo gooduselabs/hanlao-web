@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<!-- Original cover art for "Tàn Đăng Ký" (lantern motif). Rendered to WebP by scripts/media.mjs. 600×900 (2:3). -->
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600&family=Playfair+Display:ital,wght@0,800;0,900;1,500&display=block&subset=vietnamese" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 600px; height: 900px; overflow: hidden; background: #0b1430; }
+  svg { display: block; }
+  .t { font-family: 'Playfair Display', serif; }
+  .s { font-family: 'Be Vietnam Pro', sans-serif; }
+</style>
+</head>
+<body>
+<svg id="art" width="600" height="900" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08102a"/>
+      <stop offset=".38" stop-color="#16245a"/>
+      <stop offset=".62" stop-color="#2d3a7a"/>
+      <stop offset=".8" stop-color="#5a4a86"/>
+      <stop offset="1" stop-color="#1a1638"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fff6dc" stop-opacity=".95"/>
+      <stop offset=".25" stop-color="#ffe6b0" stop-opacity=".55"/>
+      <stop offset=".6" stop-color="#9fb7ff" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#9fb7ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffd38a" stop-opacity=".9"/>
+      <stop offset=".35" stop-color="#ff9a4d" stop-opacity=".45"/>
+      <stop offset=".7" stop-color="#ff7e42" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#ff7e42" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b8341c"/>
+      <stop offset=".3" stop-color="#f06a35"/>
+      <stop offset=".5" stop-color="#ffb25e"/>
+      <stop offset=".7" stop-color="#f06a35"/>
+      <stop offset="1" stop-color="#a52d18"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6b4a1c"/>
+      <stop offset=".5" stop-color="#e9c27a"/>
+      <stop offset="1" stop-color="#6b4a1c"/>
+    </linearGradient>
+    <radialGradient id="flame" cx=".5" cy=".62" r=".5">
+      <stop offset="0" stop-color="#fffbe8"/>
+      <stop offset=".45" stop-color="#ffe08a"/>
+      <stop offset="1" stop-color="#ff9a4d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff7e0"/>
+      <stop offset=".55" stop-color="#ffd98f"/>
+      <stop offset="1" stop-color="#f3a54e"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0f26" stop-opacity="0"/>
+      <stop offset=".55" stop-color="#0a0f26" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#070b1d"/>
+    </linearGradient>
+    <filter id="blur6" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="blur14" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+    <filter id="blur2"><feGaussianBlur stdDeviation="1.4"/></filter>
+    <filter id="glowText" x="-20%" y="-50%" width="140%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="7" result="b"/>
+      <feFlood flood-color="#ff8a3d" flood-opacity=".55"/>
+      <feComposite in2="b" operator="in" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="600" height="900" fill="url(#sky)"/>
+  <g id="stars"></g>
+
+  <!-- moon -->
+  <circle cx="430" cy="210" r="210" fill="url(#moonGlow)"/>
+  <circle cx="430" cy="210" r="62" fill="#fff4d6"/>
+  <circle cx="410" cy="190" r="13" fill="#f1dcae" opacity=".55"/><circle cx="450" cy="232" r="8" fill="#f1dcae" opacity=".45"/><circle cx="446" cy="182" r="5" fill="#f1dcae" opacity=".4"/>
+
+  <!-- far ranges -->
+  <path d="M0 470 L60 420 L110 445 L170 360 L215 400 L262 300 L300 360 L345 330 L400 395 L455 350 L520 410 L600 380 V900 H0Z" fill="#33407e" opacity=".85"/>
+  <!-- Thiên Đăng: the stone lantern on the summit -->
+  <g transform="translate(262 300)">
+    <circle r="26" fill="url(#warm)"/>
+    <rect x="-4" y="-16" width="8" height="12" rx="1" fill="#1b2350"/>
+    <path d="M-8 -16 h16 l-3 -5 h-10z" fill="#1b2350"/>
+    <circle cy="-10" r="2.4" fill="#ffe7a8"/>
+  </g>
+  <ellipse cx="300" cy="455" rx="320" ry="26" fill="#c9d4ff" opacity=".18" filter="url(#blur14)"/>
+  <path d="M0 560 L70 480 L130 520 L205 440 L270 505 L330 455 L395 520 L470 470 L540 515 L600 490 V900 H0Z" fill="#232e63"/>
+  <ellipse cx="160" cy="545" rx="260" ry="22" fill="#d9e1ff" opacity=".16" filter="url(#blur14)"/>
+  <ellipse cx="470" cy="575" rx="220" ry="20" fill="#d9e1ff" opacity=".14" filter="url(#blur14)"/>
+  <path d="M0 640 L90 575 L160 610 L240 560 L320 620 L410 570 L500 625 L600 590 V900 H0Z" fill="#171f49"/>
+
+  <!-- warm glow from the lantern -->
+  <circle cx="300" cy="455" r="230" fill="url(#warm)" opacity=".55"/>
+
+  <!-- hanging cord -->
+  <path d="M300 0 C 300 120, 304 220, 300 330" stroke="#0d1230" stroke-width="3" fill="none"/>
+  <!-- lantern -->
+  <g transform="translate(300 455)">
+    <rect x="-34" y="-128" width="68" height="16" rx="5" fill="url(#brass)"/>
+    <rect x="-22" y="-138" width="44" height="12" rx="4" fill="#3b2a12"/>
+    <path d="M-78 -112 C -104 -60, -104 60, -78 112 L 78 112 C 104 60, 104 -60, 78 -112 Z" fill="url(#paper)"/>
+    <g stroke="#7a1f0e" stroke-opacity=".55" stroke-width="2" fill="none">
+      <path d="M-50 -112 C -64 -50, -64 50, -50 112"/>
+      <path d="M-22 -112 C -28 -50, -28 50, -22 112"/>
+      <path d="M0 -112 V112"/>
+      <path d="M22 -112 C 28 -50, 28 50, 22 112"/>
+      <path d="M50 -112 C 64 -50, 64 50, 50 112"/>
+    </g>
+    <g stroke="#ffcf8a" stroke-opacity=".28" stroke-width="1.5">
+      <path d="M-96 -60 H96"/><path d="M-101 0 H101"/><path d="M-96 60 H96"/>
+    </g>
+    <ellipse cx="0" cy="10" rx="58" ry="78" fill="url(#flame)" opacity=".9"/>
+    <ellipse cx="0" cy="18" rx="14" ry="24" fill="#fffbe8" filter="url(#blur6)"/>
+    <!-- paper label band -->
+    <rect x="-13" y="-96" width="26" height="74" rx="3" fill="#ffe2a8" opacity=".32"/>
+    <path d="M-6 -84 h12 M-6 -70 h12 M-6 -56 h12 M-6 -42 h12" stroke="#7a1f0e" stroke-opacity=".45" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="-34" y="112" width="68" height="16" rx="5" fill="url(#brass)"/>
+    <path d="M0 128 V176" stroke="#e9c27a" stroke-width="3"/>
+    <path d="M-10 170 h20 l-4 46 h-12z" fill="#c23b1d"/>
+    <path d="M-6 176 v36 M0 176 v40 M6 176 v36" stroke="#7a1f0e" stroke-opacity=".6" stroke-width="1.4"/>
+  </g>
+  <g id="embers"></g>
+
+  <!-- foreground and text panel -->
+  <path d="M0 720 Q 150 670 300 705 T 600 690 V900 H0Z" fill="#0e143a"/>
+  <rect y="600" width="600" height="300" fill="url(#fade)"/>
+
+  <text class="s" x="300" y="70" text-anchor="middle" fill="#ffe9c2" fill-opacity=".9" font-size="17" font-weight="600" letter-spacing="7">HÀN LÃO</text>
+  <path d="M232 88 H282 M318 88 H368" stroke="#ffd98f" stroke-opacity=".6" stroke-width="1.2"/>
+  <circle cx="300" cy="88" r="3" fill="#ffb25e"/>
+
+  <text class="t" x="300" y="768" text-anchor="middle" fill="url(#title)" font-size="70" font-weight="900" letter-spacing="2" filter="url(#glowText)">TÀN ĐĂNG KÝ</text>
+  <text class="t" x="300" y="812" text-anchor="middle" fill="#ffe9c2" font-size="25" font-style="italic" font-weight="500">— Ngọn Đèn Không Tắt —</text>
+  <text class="s" x="300" y="860" text-anchor="middle" fill="#c9d1f5" fill-opacity=".75" font-size="12.5" font-weight="500" letter-spacing="4">TRUYỆN TIÊN HIỆP NGUYÊN TÁC</text>
+
+  <rect x="16" y="16" width="568" height="868" rx="8" fill="none" stroke="#ffd98f" stroke-opacity=".28" stroke-width="1.5"/>
+</svg>
+<script>
+  // Deterministic stars and embers (seeded LCG) so every render is identical.
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const NS = 'http://www.w3.org/2000/svg';
+  const stars = document.getElementById('stars');
+  for (let i = 0; i < 90; i++) {
+    const c = document.createElementNS(NS, 'circle');
+    const y = rnd() * 420;
+    c.setAttribute('cx', (rnd() * 600).toFixed(1));
+    c.setAttribute('cy', y.toFixed(1));
+    c.setAttribute('r', (rnd() * 1.3 + 0.3).toFixed(2));
+    c.setAttribute('fill', '#fff');
+    c.setAttribute('opacity', (0.25 + rnd() * 0.6 * (1 - y / 520)).toFixed(2));
+    stars.append(c);
+  }
+  const embers = document.getElementById('embers');
+  for (let i = 0; i < 26; i++) {
+    const c = document.createElementNS(NS, 'circle');
+    const a = rnd() * Math.PI * 2, d = 110 + rnd() * 150;
+    c.setAttribute('cx', (300 + Math.cos(a) * d * 0.9).toFixed(1));
+    c.setAttribute('cy', (420 + Math.sin(a) * d * 0.8 - rnd() * 60).toFixed(1));
+    c.setAttribute('r', (rnd() * 2.6 + 0.8).toFixed(2));
+    c.setAttribute('fill', rnd() > 0.5 ? '#ffb25e' : '#ffe08a');
+    c.setAttribute('opacity', (0.35 + rnd() * 0.55).toFixed(2));
+    if (rnd() > 0.6) c.setAttribute('filter', 'url(#blur2)');
+    embers.append(c);
+  }
+</script>
+</body>
+</html>

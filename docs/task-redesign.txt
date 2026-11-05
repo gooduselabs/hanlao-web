@@ -1,0 +1,26 @@
+TASK: REDESIGN Hàn Lão Đọc Truyện (~/Projects/hanlao-web) — colors + layout, in the style of webnovel.vn
+
+USER FEEDBACK (verbatim): "Thực sự nó chưa đẹp bạn ơi, về màu sắc bố cục điều không đẹp gì cả nhé. Em tham khảo màu sắc ở trang này nhé https://webnovel.vn/"
+Translation: "Honestly it's not pretty yet — the colors and the layout are not attractive at all. Please use the colors of https://webnovel.vn/ as reference."
+The current sunrise jade/gold/cream palette is REJECTED. Replace it entirely.
+
+REFERENCE (read these first, look at the PNGs with your Read tool):
+- docs/reference/webnovel/palette.md (hex palette + layout patterns)
+- docs/reference/webnovel/home-1440.png, home-390.png, detail-1440.png, detail-390.png, chapter-1440.png, chapter-390.png (full-page; very tall — crops in docs/reference/webnovel/crops/)
+Key palette: white bg #ffffff, soft grey #f5f5f5 panels/footer/zebra rows, borders #eeeeee, primary blue #0866ff (hover #2563eb, tint #eff6ff / #b8d4ff, soft gradient #eaf1ff→#f5f7ff), orange accent #ff7e42 for badges/"mới"/hot, ink #161925 headings, navy #2e2e5d titles, body text #585858, muted #6b7280. Font "Be Vietnam Pro" (self-host or Google Fonts with display=swap; Vietnamese subset). Radius 10px cards / 20px large blocks / 999px pills. Shadow 0 3px 4px rgba(0,0,0,.15). Container 1200px, header 64px.
+
+RULES: Inspiration only — do NOT copy their logo, brand name, images, text or code. Keep brand "Hàn Lão Đọc Truyện" and only the author's own stories (Tàn Đăng Ký, content synced from ~/Projects/han-lao/longform). Do not push, deploy, or add git remotes. Do not touch ~/Projects/han-lao or any other process.
+
+DELIVERABLES:
+1. Spec Kit (light): create specs/002-redesign/ with spec.md, plan.md, tasks.md for this redesign; then implement and tick tasks.
+2. New visual system: CSS tokens for the palette above, typography, spacing, components.
+3. Layout like a professional Vietnamese novel platform:
+   - Sticky white header: logo (create a simple original wordmark/lantern icon), nav (Trang chủ, Truyện, Mới cập nhật, Giới thiệu), search box (client-side search over chapter titles is fine), mobile hamburger.
+   - Home: featured banner/hero for "Tàn Đăng Ký" (cover + synopsis + "Đọc từ đầu" blue pill + "Đọc tiếp" if progress), "Mới cập nhật" table/list (zebra rows: chương | tiêu đề | thời gian), book card grid with covers, a ranking/"Đọc nhiều" sidebar panel or list, tags/genre pills, polished footer (#f5f5f5) with links + AI-assist disclosure.
+   - Cover art: create an attractive original cover for "Tàn Đăng Ký" (lantern motif; SVG or rendered PNG via playwright, 2:3 ratio). You may reuse YouTube thumbnails ~/Projects/han-lao/out/long/hoiNNN_thumb.jpg (copy into public/, optimized/resized) as chapter images on chapter list cards and chapter headers.
+   - Series/detail page: cover left + info right (author, status, số hồi, tags, buttons), description, chapter list grid (2–3 columns desktop) with thumbnails optional.
+   - Chapter page: clean white reading column, breadcrumbs, title, prev/next/mục lục pill buttons top & bottom, matching webnovel.vn calm reading look.
+4. Keep ALL existing reading features working: 7 reading themes, font family/size/line-height/width, auto-scroll with speed, TTS vi-VN, fullscreen, progress memory/resume, YouTube embed facade, RSS/sitemap/SEO, AI-assist disclosure. npm test and npm run qa must still pass (update QA selectors if needed).
+5. npm run build must pass. Regenerate QA screenshots into qa/ (home, series, chapter desktop 1440 + mobile 390, settings panel open) — name them home-desktop.png, home-mobile.png, series-desktop.png, series-mobile.png, chapter-desktop.png, chapter-mobile.png, chapter-desktop-settings.png.
+6. Self-review: Read your new screenshots next to the reference PNGs, critique honestly (colors, spacing, alignment, hierarchy, empty areas, broken images), and iterate at least twice until it clearly matches the reference's polish and color feel. No lazy images left blank in screenshots (wait for load).
+7. git commit locally (several commits OK). Update docs/web-progress.md with a "Redesign v2" section. Finish with a short summary.

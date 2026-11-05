@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview --port 4321",
     "test": "node --test tests/*.test.mjs",
-    "qa": "node scripts/screenshots.mjs"
+    "qa": "node scripts/screenshots.mjs",
+    "media": "node scripts/media.mjs"
   },
   "keywords": [],
   "author": "",
