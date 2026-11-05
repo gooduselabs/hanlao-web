@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BrandMark from '../components/BrandMark.astro';
+import Logo from '../components/Logo.astro';
 import about from '../../content/about.json';
 import { SITE, url } from '../lib/site';
 
@@ -14,13 +14,14 @@ const desc = section(about.aboutMd, /Mô tả kênh/);
 const intro = section(about.introMd, /Lời kể/);
 ---
 <BaseLayout title="Giới thiệu" description="Hàn Lão là ai? Một ông lão mê truyện tiên hiệp, kể lại những câu chuyện nguyên tác cho các con nghe.">
-  <section class="page-head">
-    <div class="container" style="display:flex;gap:18px;align-items:center">
-      <BrandMark size={72} class="" />
-      <div><span class="eyebrow">Giới thiệu</span><h1 style="margin:0">Về Hàn Lão</h1></div>
-    </div>
-  </section>
-  <div class="container section" style="padding-top:24px">
+  <div class="container">
+    <nav class="crumbs" aria-label="Đường dẫn"><a href={url('/')}>Trang chủ</a><span class="sep" aria-hidden="true">›</span><span aria-current="page">Giới thiệu</span></nav>
+    <section class="about-hero">
+      <Logo mark />
+      <div><h1>Về Hàn Lão</h1><p>Một ông lão mê truyện tiên hiệp, kể lại những câu chuyện nguyên tác cho các con nghe.</p></div>
+    </section>
+  </div>
+  <div class="container section" style="padding-top:28px">
     <div class="prose">
       {desc.map((p) => <p>{p}</p>)}
       {intro.length > 0 && (
@@ -35,9 +36,9 @@ const intro = section(about.introMd, /Lời kể/);
         không quảng cáo. Tuỳ chỉnh màu nền, cỡ chữ, tự cuộn và cả nghe đọc đều được lưu ngay trên máy của các con.
       </p>
       <p><strong>Minh bạch:</strong> {SITE.disclosure}</p>
-      <p style="display:flex;gap:12px;flex-wrap:wrap;font-family:var(--font-sans)">
+      <p class="actions">
         <a class="btn btn-primary" href={url('truyen/')}>Vào đọc truyện</a>
-        <a class="btn btn-ghost" href={SITE.youtube} target="_blank" rel="noopener">▶ Kênh YouTube @hanlaodoctruyen</a>
+        <a class="btn btn-outline" href={SITE.youtube} target="_blank" rel="noopener">Kênh YouTube @hanlaodoctruyen</a>
       </p>
     </div>
   </div>

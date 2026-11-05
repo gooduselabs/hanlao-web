@@ -4,7 +4,7 @@ import { chromium, devices } from 'playwright';
 import fs from 'node:fs';
 
 const BASE = (process.env.QA_URL || 'http://localhost:4321').replace(/\/$/, '');
-const pages = { home: '/', series: '/truyen/tan-dang-ky/', chapter: '/truyen/tan-dang-ky/hoi-1/', about: '/gioi-thieu/' };
+const pages = { home: '/', series: '/truyen/tan-dang-ky/', chapter: '/truyen/tan-dang-ky/hoi-1/', about: '/gioi-thieu/', list: '/truyen/' };
 const viewports = {
   mobile: { ...devices['iPhone 13'], defaultBrowserType: undefined },
   desktop: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
@@ -12,6 +12,22 @@ const viewports = {
 fs.mkdirSync('qa', { recursive: true });
 const report = { base: BASE, errors: [], checks: {} };
 const browser = await chromium.launch();
+
+// Scroll through the page so lazy images load, then wait until every <img> has decoded.
+async function settle(page) {
+  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(async () => {
+    const h = document.documentElement.scrollHeight;
+    for (let y = 0; y < h; y += Math.round(innerHeight * 0.8)) {
+      scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 60));
+    }
+    scrollTo(0, 0);
+  });
+  await page.waitForFunction(() => [...document.images].every((i) => i.complete), null, { timeout: 15000 });
+  await page.waitForTimeout(250);
+  return page.evaluate(() => [...document.images].filter((i) => !i.naturalWidth).map((i) => i.currentSrc || i.src));
+}
 
 for (const [vp, opts] of Object.entries(viewports)) {
   const { defaultBrowserType, ...ctxOpts } = opts;
@@ -21,14 +37,34 @@ for (const [vp, opts] of Object.entries(viewports)) {
   page.on('console', (m) => m.type() === 'error' && !/ytimg|fonts|youtube/i.test(m.text()) && report.errors.push(`${vp} console: ${m.text()}`));
   for (const [name, path] of Object.entries(pages)) {
     await page.goto(BASE + path, { waitUntil: 'networkidle' });
-    await page.evaluate(() => document.fonts.ready);
+    const broken = await settle(page);
+    report.checks[`${name}-${vp}-imagesLoaded`] = broken.length === 0;
+    if (broken.length) report.errors.push(`${vp} ${name}: broken images ${broken.join(', ')}`);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
     report.checks[`${name}-${vp}-noHorizontalOverflow`] = !overflow;
     await page.screenshot({ path: `qa/${name}-${vp}.png`, fullPage: name !== 'chapter' });
   }
+  // Header: search + mobile menu
+  await page.goto(BASE + pages.home, { waitUntil: 'networkidle' });
+  if (vp === 'mobile') {
+    await page.click('[data-menu]');
+    report.checks[`menu-opens-${vp}`] = await page.isVisible('#drawer');
+    await page.click('[data-search-toggle]');
+  }
+  const q = vp === 'mobile' ? '#q-mobile' : '#q-desktop';
+  await page.fill(q, 'den tat');
+  await page.waitForSelector(`${q}-results li[role="option"]`, { timeout: 5000 }).catch(() => {});
+  report.checks[`search-${vp}`] = /Đêm Đèn Tắt/.test((await page.textContent(`${q}-results`)) ?? '');
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: `qa/search-${vp}.png` });
+
   // Reader mode interactions
   await page.goto(BASE + pages.chapter, { waitUntil: 'networkidle' });
+  await settle(page);
   await page.click('[data-act="settings"]');
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: `qa/chapter-${vp}-settings.png` });
+  report.checks[`settings-panel-${vp}`] = await page.isVisible('#r-settings');
   await page.click('label.sw-sepia');
   await page.waitForTimeout(400);
   await page.screenshot({ path: `qa/chapter-${vp}-settings-sepia.png` });
@@ -49,7 +85,8 @@ for (const [vp, opts] of Object.entries(viewports)) {
   await page.screenshot({ path: `qa/chapter-${vp}-resume.png` });
   await page.evaluate(() => { localStorage.setItem('hanlao:prefs:v1', JSON.stringify({ theme: 'dark' })); });
   await page.reload({ waitUntil: 'networkidle' });
-  await page.click('[data-act="toc"]');
+  await settle(page);
+  await page.click('[data-open="toc"]');
   await page.waitForTimeout(400);
   await page.screenshot({ path: `qa/chapter-${vp}-dark-toc.png` });
   await page.keyboard.press('Escape');

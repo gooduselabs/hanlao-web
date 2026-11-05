@@ -1,0 +1,24 @@
+---
+// Original mark: a paper lantern in a blue tile, orange flame. Wordmark "Hàn Lão / ĐỌC TRUYỆN".
+import { SITE, url } from '../lib/site';
+interface Props { mark?: boolean; href?: string | false; class?: string }
+const { mark = false, href = url('/'), class: cls = '' } = Astro.props;
+---
+{mark ? (
+  <svg class={`logo-mark ${cls}`} viewBox="0 0 48 48" aria-hidden="true">
+    <rect width="48" height="48" rx="13" fill="#0866ff" />
+    <path d="M24 7v4" stroke="#fff" stroke-width="2.4" stroke-linecap="round" />
+    <rect x="17" y="11" width="14" height="4" rx="2" fill="#fff" />
+    <path d="M15.5 15h17c3.5 4 3.5 16 0 20h-17c-3.5-4-3.5-16 0-20z" fill="#fff" />
+    <path d="M20 15.5c-1.4 4-1.4 15 0 19M28 15.5c1.4 4 1.4 15 0 19" stroke="#b8d4ff" stroke-width="1.2" fill="none" />
+    <ellipse cx="24" cy="25.5" rx="4.2" ry="6" fill="#ff7e42" />
+    <ellipse cx="24" cy="27" rx="1.8" ry="2.8" fill="#ffd29a" />
+    <rect x="17" y="35" width="14" height="4" rx="2" fill="#fff" />
+    <path d="M24 39v3" stroke="#ff7e42" stroke-width="2.4" stroke-linecap="round" />
+  </svg>
+) : (
+  <a class={`logo ${cls}`} href={href || undefined} aria-label={`${SITE.name} — trang chủ`}>
+    <Astro.self mark />
+    <span class="logo-text">Hàn Lão<small>ĐỌC TRUYỆN</small></span>
+  </a>
+)}

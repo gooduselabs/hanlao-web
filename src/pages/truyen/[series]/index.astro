@@ -1,17 +1,25 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import SeriesCover from '../../../components/SeriesCover.astro';
-import ContinueCard from '../../../components/ContinueCard.astro';
+import Cover from '../../../components/Cover.astro';
+import Thumb from '../../../components/Thumb.astro';
+import Continue from '../../../components/Continue.astro';
+import Icon from '../../../components/Icon.astro';
+import YouTubeIcon from '../../../components/YouTubeIcon.astro';
 import { allSeries, episodesOf, type Series } from '../../../lib/episodes';
+import { coverFor, formatDate } from '../../../lib/media';
 import { SITE, episodePath, url } from '../../../lib/site';
 
 export async function getStaticPaths() {
   return (await allSeries()).map((s) => ({ params: { series: s.data.slug }, props: { s } }));
 }
 const { s } = Astro.props as { s: Series };
-const eps = await episodesOf(s.data.slug);
-const videos = eps.filter((e) => e.data.youtubeId).length;
+const slug = s.data.slug;
+const eps = await episodesOf(slug);
+const videos = eps.filter((e) => e.data.youtubeId);
+const chaptersTotal = eps.reduce((n, e) => n + (e.data.chapterCount ?? 0), 0);
 const subtitle = s.data.fullTitle.split('—')[1]?.trim() ?? '';
+const updated = eps.map((e) => e.data.updated ?? '').sort().at(-1);
+const cover = coverFor(slug);
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Book',
@@ -21,53 +29,98 @@ const jsonLd = {
   genre: s.data.genre,
   description: s.data.synopsis,
   numberOfPages: eps.length,
-  url: new URL(url(`truyen/${s.data.slug}/`), Astro.site).href,
+  url: new URL(url(`truyen/${slug}/`), Astro.site).href,
+  ...(cover ? { image: new URL(cover, Astro.site).href } : {}),
 };
 ---
 <BaseLayout title={s.data.fullTitle} description={`${s.data.tagline} ${s.data.synopsis}`.slice(0, 300)} jsonLd={jsonLd}>
-  <section class="series-hero">
-    <div class="container wrap">
-      <div class="cover rise"><SeriesCover title={s.data.title} subtitle={subtitle} slug={s.data.slug} /></div>
-      <div class="rise rise-2">
-        <span class="eyebrow">Truyện nguyên tác · Hàn Lão kể</span>
-        <h1>{s.data.fullTitle}</h1>
-        {s.data.tagline && <p style="font-size:1.1rem;font-weight:600;color:var(--vermilion);margin:0 0 10px">{s.data.tagline}</p>}
-        <div class="stats">
-          {s.data.genre.map((g) => <span class="chip">{g}</span>)}
-          <span class="chip jade">{s.data.status}</span>
-          <span class="chip">{eps.length} hồi</span>
-          {videos > 0 && <span class="chip red">▶ {videos} hồi có video</span>}
+  <div class="container">
+    <nav class="crumbs" aria-label="Đường dẫn">
+      <a href={url('/')}>Trang chủ</a><span class="sep" aria-hidden="true">›</span>
+      <a href={url('truyen/')}>Truyện</a><span class="sep" aria-hidden="true">›</span>
+      <span aria-current="page">{s.data.title}</span>
+    </nav>
+  </div>
+
+  <div class="container with-aside">
+    <div>
+      <section class="detail" aria-labelledby="series-h">
+        <div class="detail-cover"><Cover slug={slug} title={s.data.title} eager /></div>
+        <div class="detail-info">
+          <h1 id="series-h">{s.data.title}</h1>
+          {subtitle && <p class="subtitle">{subtitle}</p>}
+          <div class="meta-row">
+            <span><Icon name="user" />Tác giả: <b>Hàn Lão</b></span>
+            <span><Icon name="clock" />Cập nhật {formatDate(updated)}</span>
+          </div>
+          <div class="tags">
+            <span class="pill pill-green">● {s.data.status}</span>
+            {s.data.genre.map((g) => <span class="pill">{g}</span>)}
+          </div>
         </div>
-        <p class="synopsis">{s.data.synopsis}</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          {eps[0] && <a class="btn btn-primary" href={episodePath(s.data.slug, eps[0].data.episode)}>Đọc từ đầu</a>}
-          {eps.at(-1) && <a class="btn btn-ghost" href={episodePath(s.data.slug, eps.at(-1)!.data.episode)}>Hồi mới nhất</a>}
-          <a class="btn btn-ghost" href={s.data.youtubeChannel ?? SITE.youtube} target="_blank" rel="noopener">▶ Kênh YouTube</a>
+        <div class="detail-body">
+          <dl class="stats">
+            <div><dt>Số hồi</dt><dd>{eps.length}</dd></div>
+            <div><dt>Số chương</dt><dd>{chaptersTotal}</dd></div>
+            <div><dt>Có video</dt><dd>{videos.length}</dd></div>
+            <div><dt>Trạng thái</dt><dd class="small">{s.data.status}</dd></div>
+          </dl>
+          <div class="actions">
+            {eps[0] && <a class="btn btn-primary" href={episodePath(slug, eps[0].data.episode)} data-hide-when-continue><Icon name="book" />Đọc từ đầu</a>}
+            <Continue series={slug} variant="btn" />
+            {eps.at(-1) && <a class="btn btn-outline" href={episodePath(slug, eps.at(-1)!.data.episode)}><Icon name="bolt" />Hồi mới nhất</a>}
+            <a class="btn btn-grey" href={s.data.youtubeChannel ?? SITE.youtube} target="_blank" rel="noopener"><YouTubeIcon class="icon yt-red" />YouTube</a>
+          </div>
+          <Continue series={slug} />
         </div>
-        <ContinueCard series={s.data.slug} />
-      </div>
+      </section>
+
+      <section class="desc" aria-labelledby="desc-h">
+        <div class="desc-line"><h2 id="desc-h">Giới thiệu</h2></div>
+        {s.data.tagline && <p class="tagline">{s.data.tagline}</p>}
+        <p>{s.data.synopsis}</p>
+      </section>
+
+      <section id="danh-sach" aria-labelledby="toc-h">
+        <div class="toc-head"><h2 id="toc-h">Danh sách hồi ({eps.length})</h2><span class="sort">Từ cũ đến mới</span></div>
+        <ol class="ch-grid">
+          {eps.map((e, i) => (
+            <li>
+              <a href={episodePath(slug, e.data.episode)} data-progress-key={`${slug}/${e.data.episode}`}>
+                <Thumb series={slug} ep={e.data.episode} title={e.data.title} play={!!e.data.youtubeId} eager={i < 4} />
+                <span>
+                  <small>Hồi {e.data.episode}{i >= eps.length - 3 && <span class="badge">Mới</span>}<span class="badge read-mark" hidden>Đã đọc</span></small>
+                  <b><span class="sr-only">Hồi {e.data.episode}: </span>{e.data.title}</b>
+                  <span class="m">{e.data.chapterCount} chương{e.data.youtubeId ? ' · ▶ có video' : ''}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
-  </section>
-  <section class="section" aria-labelledby="toc-h">
-    <div class="container" style="max-width:880px">
-      <div class="section-head"><div><span class="eyebrow">Mục lục</span><h2 id="toc-h">Danh sách các hồi</h2></div></div>
-      <ol class="ep-list">
-        {eps.map((e) => (
-          <li>
-            <a href={episodePath(s.data.slug, e.data.episode)} data-progress-key={`${s.data.slug}/${e.data.episode}`}>
-              <span class="n" aria-hidden="true">{e.data.episode}</span>
-              <span>
-                <span class="t"><span class="sr-only">Hồi {e.data.episode}: </span>{e.data.title}</span>
-                {e.data.summary && <span class="s">{e.data.summary}</span>}
-              </span>
-              <span class="aside" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-                {e.data.youtubeId && <span class="chip red">▶ Video</span>}
-                <span class="chip jade read-mark" hidden>Đã đọc</span>
-              </span>
+
+    <aside class="detail-aside">
+      <section class="panel" aria-labelledby="vid-h">
+        <h2 class="panel-title" id="vid-h">Nghe Hàn Lão kể</h2>
+        <div class="vid-grid">
+          {videos.slice(0, 6).map((e) => (
+            <a href={episodePath(slug, e.data.episode)}>
+              <Thumb series={slug} ep={e.data.episode} title={e.data.title} play />
+              <span class="clamp-2">Hồi {e.data.episode}: {e.data.title}</span>
             </a>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </section>
+          ))}
+        </div>
+      </section>
+      <section class="panel" aria-labelledby="info-h">
+        <h2 class="panel-title" id="info-h">Đọc thoải mái</h2>
+        <ul class="tips">
+          <li><Icon name="sliders" />7 màu nền, chỉnh cỡ chữ, giãn dòng, độ rộng</li>
+          <li><Icon name="scroll" />Tự cuộn với tốc độ tuỳ chọn</li>
+          <li><Icon name="headphones" />Nghe đọc bằng giọng tiếng Việt</li>
+          <li><Icon name="clock" />Tự nhớ chỗ đang đọc trên máy</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
 </BaseLayout>

@@ -1,21 +1,29 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import SeriesCover from '../../components/SeriesCover.astro';
+import Cover from '../../components/Cover.astro';
 import { allSeries, episodesOf } from '../../lib/episodes';
-import { seriesPath } from '../../lib/site';
+import { SITE, seriesPath, url } from '../../lib/site';
 const list = await Promise.all((await allSeries()).map(async (s) => ({ s, n: (await episodesOf(s.data.slug)).length })));
 ---
 <BaseLayout title="Danh sách truyện" description="Tất cả truyện tiên hiệp nguyên tác của Hàn Lão.">
-  <section class="page-head"><div class="container"><span class="eyebrow">Thư phòng</span><h1>Danh sách truyện</h1></div></section>
-  <div class="container section" style="padding-top:16px">
-    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
-      {list.map(({ s, n }) => (
-        <a class="ep-card" href={seriesPath(s.data.slug)} style="padding:14px">
-          <SeriesCover title={s.data.title} slug={s.data.slug} subtitle="Ngọn Đèn Không Tắt" />
-          <h3>{s.data.fullTitle}</h3>
-          <span class="meta"><span class="chip">{n} hồi</span><span class="chip jade">{s.data.status}</span></span>
-        </a>
-      ))}
+  <div class="container">
+    <nav class="crumbs" aria-label="Đường dẫn"><a href={url('/')}>Trang chủ</a><span class="sep" aria-hidden="true">›</span><span aria-current="page">Truyện</span></nav>
+    <div class="page-title"><h1>Tủ truyện của Hàn Lão</h1><p>Truyện tiên hiệp nguyên tác — chép trọn từng hồi để các con đọc thong thả.</p></div>
+    <div class="section" style="padding-top:20px">
+      <div class="book-grid">
+        {list.map(({ s, n }, i) => (
+          <a class="book" href={seriesPath(s.data.slug)}>
+            <Cover slug={s.data.slug} title={s.data.title} eager={i < 6} badge={s.data.status} />
+            <h3>{s.data.title}</h3>
+            <small>{n} hồi · {s.data.genre[0]}</small>
+          </a>
+        ))}
+        <div class="shelf-note">
+          <h2>Mỗi hồi một đêm kể chuyện</h2>
+          <p>Hiện lão đang kể <b>Tàn Đăng Ký</b>. Hồi mới được chép lên đây cùng lúc với bản kể trên kênh YouTube — theo dõi kênh hoặc RSS để không lỡ hồi nào.</p>
+          <p class="actions"><a class="btn btn-primary btn-sm" href={SITE.youtube} target="_blank" rel="noopener">Theo dõi kênh</a><a class="btn btn-outline btn-sm" href={url('rss.xml')}>RSS</a></p>
+        </div>
+      </div>
     </div>
   </div>
 </BaseLayout>

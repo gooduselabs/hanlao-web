@@ -1,0 +1,25 @@
+---
+import Icon from './Icon.astro';
+import { url } from '../lib/site';
+interface Props { id: string }
+const { id } = Astro.props;
+---
+<form class="search" role="search" action={url('truyen/')} data-search data-index={url('search.json')} data-base={url('')}>
+  <label class="search-field">
+    <Icon name="search" />
+    <span class="sr-only">Tìm hồi, chương truyện</span>
+    <input
+      id={id}
+      type="search"
+      name="q"
+      placeholder="Tìm hồi, chương…"
+      autocomplete="off"
+      spellcheck="false"
+      role="combobox"
+      aria-expanded="false"
+      aria-autocomplete="list"
+      aria-controls={`${id}-results`}
+    />
+  </label>
+  <ul class="search-results" id={`${id}-results`} role="listbox" hidden></ul>
+</form>

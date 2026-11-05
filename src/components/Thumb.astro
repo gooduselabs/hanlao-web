@@ -1,0 +1,15 @@
+---
+import { thumbFor } from '../lib/media';
+interface Props { series: string; ep: number; title: string; eager?: boolean; badge?: string; play?: boolean; class?: string; sizes?: string }
+const { series, ep, title, eager = false, badge, play = false, class: cls = '' } = Astro.props;
+const src = thumbFor(series, ep);
+---
+<span class={`thumb ${cls}`}>
+  {src ? (
+    <img src={src} alt={`Ảnh hồi ${ep}: ${title}`} width="640" height="360" loading={eager ? 'eager' : 'lazy'} decoding="async" />
+  ) : (
+    <span class="thumb-fallback">Hồi {ep}<br />{title}</span>
+  )}
+  {badge && <span class="badge">{badge}</span>}
+  {play && <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 4v16l14-8z"/></svg></span>}
+</span>

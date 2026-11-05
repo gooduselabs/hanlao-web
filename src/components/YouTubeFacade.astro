@@ -1,17 +1,16 @@
 ---
-interface Props { id: string; title: string }
-const { id, title } = Astro.props;
+interface Props { id: string; title: string; img?: string | null }
+const { id, title, img } = Astro.props;
 const watch = `https://www.youtube.com/watch?v=${id}`;
 ---
 <figure class="yt-facade">
   <a class="yt-btn" href={watch} data-yt-id={id} data-yt-title={title} target="_blank" rel="noopener">
-    <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" decoding="async" width="480" height="360" />
+    <img src={img ?? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" decoding="async" width="640" height="360" />
     <span class="yt-play" aria-hidden="true">
-      <svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.3.3 34 .3 34 .3S12.7.3 7.4 1.7a8.5 8.5 0 0 0-6 6C0 13 0 24 0 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6c5.3 1.4 26.6 1.4 26.6 1.4s21.3 0 26.6-1.4a8.5 8.5 0 0 0 6-6C68 35 68 24 68 24s0-11-1.5-16.3Z" fill="#e8553d"/><path d="m27 34 18-10-18-10z" fill="#fff"/></svg>
+      <svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.3.3 34 .3 34 .3S12.7.3 7.4 1.7a8.5 8.5 0 0 0-6 6C0 13 0 24 0 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6c5.3 1.4 26.6 1.4 26.6 1.4s21.3 0 26.6-1.4a8.5 8.5 0 0 0 6-6C68 35 68 24 68 24s0-11-1.5-16.3Z" fill="#ff0033"/><path d="m27 34 18-10-18-10z" fill="#fff"/></svg>
     </span>
     <span class="sr-only">Xem video: {title}</span>
   </a>
-  <figcaption>🎧 Nghe Hàn Lão kể hồi này trên YouTube — video chỉ tải khi bạn bấm phát.</figcaption>
 </figure>
 <script>
   document.querySelectorAll<HTMLAnchorElement>('a[data-yt-id]').forEach((a) => {
@@ -23,6 +22,7 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
       f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
       f.allowFullscreen = true;
       f.loading = 'lazy';
+      a.closest('.r-media')?.classList.add('playing');
       a.replaceWith(f);
     });
   });

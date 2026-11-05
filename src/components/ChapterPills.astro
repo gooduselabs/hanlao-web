@@ -1,0 +1,10 @@
+---
+import Icon from './Icon.astro';
+interface Props { prev?: string | null; next?: string | null; toc: string; where: 'top' | 'bottom' }
+const { prev, next, toc, where } = Astro.props;
+---
+<nav class={`r-pills r-pills-${where}`} aria-label={where === 'top' ? 'Chuyển hồi (đầu trang)' : 'Chuyển hồi (cuối trang)'}>
+  {prev ? <a class="btn btn-sm btn-orange" href={prev} rel="prev"><Icon name="chevL" />Hồi trước</a> : <span class="btn btn-sm btn-orange" aria-disabled="true"><Icon name="chevL" />Hồi trước</span>}
+  <a class="btn btn-sm btn-grey" href={toc}><Icon name="list" />Mục lục</a>
+  {next ? <a class="btn btn-sm btn-primary" href={next} rel="next">Hồi sau<Icon name="chevR" /></a> : <span class="btn btn-sm btn-primary" aria-disabled="true">Hồi sau<Icon name="chevR" /></span>}
+</nav>

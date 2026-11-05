@@ -1,0 +1,19 @@
+---
+import Thumb from './Thumb.astro';
+import type { Episode } from '../lib/episodes';
+import { episodePath } from '../lib/site';
+interface Props { ep: Episode; badge?: string; summary?: boolean; eager?: boolean }
+const { ep, badge, summary = true, eager = false } = Astro.props;
+const d = ep.data;
+---
+<a class="ep-card" href={episodePath(d.seriesSlug, d.episode)} data-progress-key={`${d.seriesSlug}/${d.episode}`}>
+  <Thumb series={d.seriesSlug} ep={d.episode} title={d.title} badge={badge} play={!!d.youtubeId} eager={eager} />
+  <h3 class="clamp-2">{d.title}</h3>
+  <span class="ep-meta">
+    <span>Hồi {d.episode}</span>
+    {d.chapterCount ? <span>{d.chapterCount} chương</span> : null}
+    {d.youtubeId && <span>▶ Có video</span>}
+    <span class="badge read-mark" hidden>Đã đọc</span>
+  </span>
+  {summary && d.summary && <p class="clamp-2">{d.summary}</p>}
+</a>

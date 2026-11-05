@@ -1,0 +1,22 @@
+---
+import Icon from './Icon.astro';
+interface Props { series?: string; variant?: 'btn' | 'strip' }
+const { series = '', variant = 'strip' } = Astro.props;
+---
+{variant === 'btn' ? (
+  <a class="btn btn-orange" href="#" data-continue={series} hidden><Icon name="bolt" />Đọc tiếp <span data-continue-pct></span></a>
+) : (
+  <a class="continue" href="#" data-continue={series} hidden>
+    <Icon name="clock" />
+    <span class="continue-text">
+      <small>Bạn đang đọc dở</small>
+      <b data-continue-title></b>
+      <span class="meter"><span style="width:0"></span></span>
+    </span>
+    <span class="continue-pct" data-continue-pct></span>
+    <Icon name="chevR" />
+  </a>
+)}
+<script>
+  import '../scripts/continue.ts';
+</script>

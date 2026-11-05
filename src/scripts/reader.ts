@@ -6,7 +6,7 @@ const PREFS_KEY = 'hanlao:prefs:v1';
 const PROGRESS_KEY = 'hanlao:progress:v1';
 const LAST_KEY = 'hanlao:last:v1';
 const THEMES = ['light', 'sepia', 'mint', 'blue', 'pink', 'dark', 'night'];
-const DEFAULTS: Prefs = { theme: 'light', font: 'serif', size: 20, lineHeight: 1.85, width: 720, speed: 3 };
+const DEFAULTS: Prefs = { theme: 'light', font: 'sans', size: 20, lineHeight: 1.9, width: 720, speed: 3 };
 const LIMITS = { size: [14, 30], lineHeight: [1.4, 2.4], width: [480, 960], speed: [1, 10] } as const;
 
 const store = {
@@ -32,7 +32,7 @@ function sanitize(p: Partial<Prefs>): Prefs {
   const o = { ...DEFAULTS, ...p };
   return {
     theme: THEMES.includes(o.theme) ? o.theme : DEFAULTS.theme,
-    font: o.font === 'sans' ? 'sans' : 'serif',
+    font: o.font === 'serif' ? 'serif' : 'sans',
     size: clamp(Number(o.size) || DEFAULTS.size, LIMITS.size),
     lineHeight: clamp(Number(o.lineHeight) || DEFAULTS.lineHeight, LIMITS.lineHeight),
     width: clamp(Number(o.width) || DEFAULTS.width, LIMITS.width),
@@ -65,7 +65,7 @@ if (article && toolbar) {
     root.style.setProperty('--r-lh', String(prefs.lineHeight));
     root.style.setProperty('--r-width', `${prefs.width}px`);
     const meta = document.querySelector('meta[name="theme-color"]');
-    meta?.setAttribute('content', getComputedStyle(root).getPropertyValue('--r-bg').trim() || '#fffdf8');
+    meta?.setAttribute('content', getComputedStyle(root).getPropertyValue('--r-surround').trim() || '#ffffff');
     // sync controls
     settings.querySelectorAll<HTMLInputElement>('input[name="r-theme"]').forEach((i) => (i.checked = i.value === prefs.theme));
     settings.querySelectorAll<HTMLInputElement>('input[name="r-font"]').forEach((i) => (i.checked = i.value === prefs.font));
@@ -288,6 +288,7 @@ if (article && toolbar) {
   };
   if (synth) {
     btn('tts').hidden = false;
+    document.querySelectorAll<HTMLElement>('[data-open="tts"]').forEach((c) => (c.hidden = false));
     pickVoice();
     synth.addEventListener?.('voiceschanged', pickVoice);
   }
@@ -346,6 +347,14 @@ if (article && toolbar) {
         return apply();
     }
   });
+
+  // In-page chips (header of the chapter) forward to the floating toolbar's buttons.
+  document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((chip) =>
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      btn(chip.dataset.open!).click();
+    }),
+  );
 
   /* ---------- Keyboard shortcuts ---------- */
   addEventListener('keydown', (e) => {

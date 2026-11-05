@@ -1,14 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Logo from '../components/Logo.astro';
 import { url } from '../lib/site';
 ---
 <BaseLayout title="Không tìm thấy trang">
-  <section class="page-head" style="text-align:center;padding:96px 0">
-    <div class="container">
-      <p style="font-size:3rem;margin:0">🏮</p>
-      <h1>Đèn tắt mất rồi…</h1>
-      <p>Trang các con tìm không có ở đây. Quay về để lão kể tiếp nhé.</p>
+  <section class="container" style="text-align:center;padding:96px 0 48px">
+    <Logo mark class="nf-mark" />
+    <h1 style="font-size:30px;margin:20px 0 8px">Đèn tắt mất rồi…</h1>
+    <p>Trang các con tìm không có ở đây. Quay về để lão kể tiếp nhé.</p>
+    <p class="actions" style="justify-content:center">
       <a class="btn btn-primary" href={url('/')}>Về trang chủ</a>
-    </div>
+      <a class="btn btn-outline" href={url('truyen/')}>Danh sách truyện</a>
+    </p>
   </section>
 </BaseLayout>

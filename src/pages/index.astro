@@ -1,16 +1,32 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HeroArt from '../components/HeroArt.astro';
-import SeriesCover from '../components/SeriesCover.astro';
-import EpisodeCard from '../components/EpisodeCard.astro';
-import ContinueCard from '../components/ContinueCard.astro';
-import { allSeries, episodesOf, latestEpisodes } from '../lib/episodes';
+import Cover from '../components/Cover.astro';
+import Thumb from '../components/Thumb.astro';
+import EpCard from '../components/EpCard.astro';
+import Continue from '../components/Continue.astro';
+import Icon from '../components/Icon.astro';
+import YouTubeIcon from '../components/YouTubeIcon.astro';
+import { allSeries, episodesOf } from '../lib/episodes';
+import { formatDate } from '../lib/media';
 import { SITE, url, seriesPath, episodePath } from '../lib/site';
 
 const series = await allSeries();
-const seriesInfo = await Promise.all(series.map(async (s) => ({ s, eps: await episodesOf(s.data.slug) })));
-const latest = await latestEpisodes(6);
-const first = seriesInfo[0];
+const s = series[0];
+const eps = await episodesOf(s.data.slug);
+const slug = s.data.slug;
+const newest = [...eps].sort((a, b) => b.data.episode - a.data.episode);
+const latest = newest[0];
+const chaptersTotal = eps.reduce((n, e) => n + (e.data.chapterCount ?? 0), 0);
+const videos = eps.filter((e) => e.data.youtubeId);
+const subtitle = s.data.fullTitle.split('—')[1]?.trim() ?? '';
+// Curated "featured" list — hồi that also have a narrated video come first. No fabricated view counts.
+const featured = [...videos, ...eps.filter((e) => !e.data.youtubeId)].slice(0, 6);
+const facets = [
+  ...s.data.genre.map((g) => ({ label: g, href: seriesPath(slug) })),
+  { label: 'Đang ra', href: `${url('/')}#moi-cap-nhat` },
+  { label: `Có video (${videos.length})`, href: seriesPath(slug) + '#danh-sach' },
+  { label: 'Truyện dài kỳ', href: seriesPath(slug) },
+];
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -20,72 +36,120 @@ const jsonLd = {
   author: { '@type': 'Person', name: 'Hàn Lão' },
 };
 ---
-<BaseLayout jsonLd={jsonLd}>
-  <section class="hero">
-    <div class="container hero-inner">
-      <div>
-        <p class="kicker rise">Truyện tiên hiệp nguyên tác</p>
-        <h1 class="rise rise-2">Lão kể,<br />các con nghe.</h1>
-        <p class="lead rise rise-3">
-          Lão là <strong>Hàn Lão</strong>. Cả đời mê truyện tiên hiệp, giờ tóc bạc rồi, lão ngồi kể lại cho các con nghe —
-          chuyện có đèn, có núi, có người thương. Ở đây các con đọc trọn từng hồi, chậm rãi, theo cách mình thích.
-        </p>
-        <div class="actions rise rise-3">
-          {first && first.eps[0] && (
-            <a class="btn btn-primary" href={episodePath(first.s.data.slug, first.eps[0].data.episode)}>Đọc từ Hồi 1 →</a>
-          )}
-          {first && <a class="btn btn-ghost" href={seriesPath(first.s.data.slug)}>Mục lục {first.s.data.title}</a>}
-          <a class="btn btn-ghost" href={SITE.youtube} target="_blank" rel="noopener">▶ Nghe trên YouTube</a>
-        </div>
-        <ContinueCard />
-      </div>
-      <div class="hero-art rise rise-2"><HeroArt /></div>
-    </div>
-  </section>
+<BaseLayout jsonLd={jsonLd} bodyClass="flush-footer">
+  <div class="container">
+    <p class="tagline-bar">Đọc truyện tiên hiệp <b>nguyên tác</b><span class="hide-sm"> — Hàn Lão kể, các con nghe</span></p>
 
-  <section class="section" aria-labelledby="latest-h">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">Mới cập nhật</span>
-          <h2 id="latest-h">Những hồi mới nhất</h2>
+    <section class="feature" aria-labelledby="feature-h">
+      <div class="feature-cover"><Cover slug={slug} title={s.data.title} href={seriesPath(slug)} eager badge="Đề cử" /></div>
+      <div class="feature-info">
+        <div class="feature-kicker">
+          <span class="pill pill-blue">Truyện nổi bật</span>
+          <span class="pill pill-green">● {s.data.status}</span>
         </div>
-        {first && <a href={seriesPath(first.s.data.slug)}>Xem tất cả →</a>}
-      </div>
-      <div class="grid">
-        {latest.map((ep) => <EpisodeCard ep={ep} />)}
-      </div>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="series-h" style="padding-top:8px">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">Bộ truyện</span>
-          <h2 id="series-h">Truyện của Hàn Lão</h2>
+        <h1 id="feature-h"><a href={seriesPath(slug)}>{s.data.title}</a></h1>
+        {subtitle && <p class="subtitle">{subtitle}</p>}
+        <div class="meta-row">
+          <span><Icon name="user" />Hàn Lão</span>
+          <span><Icon name="layers" /><b>{eps.length}</b> hồi</span>
+          <span><Icon name="list" /><b>{chaptersTotal}</b> chương</span>
+          <span><Icon name="play" /><b>{videos.length}</b> video</span>
         </div>
       </div>
-      {seriesInfo.map(({ s, eps }) => (
-        <article class="series-card">
-          <a class="cover" href={seriesPath(s.data.slug)} tabindex="-1" aria-hidden="true">
-            <SeriesCover title={s.data.title} subtitle="Ngọn Đèn Không Tắt" slug={s.data.slug} />
+      <div class="feature-body">
+        <div class="tags">{s.data.genre.map((g) => <a class="pill" href={seriesPath(slug)}>{g}</a>)}</div>
+        <p class="synopsis clamp-3">{s.data.synopsis}</p>
+        <div class="actions">
+          <a class="btn btn-primary" href={episodePath(slug, eps[0].data.episode)} data-hide-when-continue><Icon name="book" />Đọc từ đầu</a>
+          <Continue series={slug} variant="btn" />
+          <a class="btn btn-outline" href={seriesPath(slug)}><Icon name="list" />Mục lục</a>
+        </div>
+        <Continue series={slug} />
+      </div>
+      {latest && (
+        <aside class="latest-card" aria-labelledby="latest-card-h">
+          <p class="label" id="latest-card-h">Hồi mới nhất <span class="badge">Mới</span></p>
+          <a href={episodePath(slug, latest.data.episode)} tabindex="-1" aria-hidden="true">
+            <Thumb series={slug} ep={latest.data.episode} title={latest.data.title} eager />
           </a>
-          <div>
-            <div class="stats">
-              {s.data.genre.map((g) => <span class="chip">{g}</span>)}
-              <span class="chip jade">{s.data.status}</span>
-              <span class="chip">{eps.length} hồi</span>
-            </div>
-            <h3><a href={seriesPath(s.data.slug)} style="color:inherit;text-decoration:none">{s.data.fullTitle}</a></h3>
-            <p style="font-family:var(--font-serif);color:var(--ink-soft);line-height:1.8">{s.data.synopsis}</p>
-            <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap">
-              {eps[0] && <a class="btn btn-primary" href={episodePath(s.data.slug, eps[0].data.episode)}>Bắt đầu đọc</a>}
-              <a class="btn btn-ghost" href={seriesPath(s.data.slug)}>Danh sách {eps.length} hồi</a>
-            </div>
-          </div>
-        </article>
-      ))}
+          <h3><a href={episodePath(slug, latest.data.episode)}>Hồi {latest.data.episode}: {latest.data.title}</a></h3>
+          <p>{latest.data.chapterCount} chương · cập nhật {formatDate(latest.data.updated)}</p>
+          <ul class="latest-list">
+            {newest.slice(1, 4).map((e) => (
+              <li><a href={episodePath(slug, e.data.episode)}><small>Hồi {e.data.episode}</small><span>{e.data.title}</span></a></li>
+            ))}
+          </ul>
+        </aside>
+      )}
+    </section>
+  </div>
+
+  <section class="section" id="moi-cap-nhat" aria-labelledby="latest-h">
+    <div class="container">
+      <div class="sec-head">
+        <h2 id="latest-h">Mới cập nhật</h2>
+        <a class="more" href={seriesPath(slug) + '#danh-sach'}>Xem toàn bộ</a>
+      </div>
+      <table class="ltable">
+        <thead>
+          <tr><th scope="col">Hồi</th><th scope="col">Tiêu đề</th><th scope="col" class="c-hide">Nội dung</th><th scope="col" class="c-hide">Độ dài</th><th scope="col" style="text-align:right">Cập nhật</th></tr>
+        </thead>
+        <tbody>
+          {newest.slice(0, 10).map((e, i) => (
+            <tr>
+              <td class="c-num">Hồi {e.data.episode}</td>
+              <td class="c-title"><a href={episodePath(slug, e.data.episode)}>{e.data.title}</a>{e.data.youtubeId && <span class="yt" title="Có video"><YouTubeIcon /><span class="sr-only">Có video</span></span>}{i < 3 && <span class="badge">Mới</span>}</td>
+              <td class="c-sum c-hide"><span>{e.data.summary}</span></td>
+              <td class="c-small c-hide">{e.data.chapterCount} chương</td>
+              <td class="c-time">{formatDate(e.data.updated)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px" aria-labelledby="eps-h">
+    <div class="container with-aside">
+      <div>
+        <div class="sec-head">
+          <h2 id="eps-h">Đọc theo hồi</h2>
+          <a class="more" href={seriesPath(slug) + '#danh-sach'}>Tất cả {eps.length} hồi</a>
+        </div>
+        <div class="ep-grid">
+          {eps.slice(0, 9).map((e) => <EpCard ep={e} />)}
+        </div>
+      </div>
+      <aside>
+        <section class="panel" aria-labelledby="rank-h">
+          <h2 class="panel-title" id="rank-h">Hồi nổi bật</h2>
+          <ol class="rank">
+            {featured.map((e) => (
+              <li>
+                <a href={episodePath(slug, e.data.episode)}>
+                  <Thumb series={slug} ep={e.data.episode} title={e.data.title} />
+                  <span><b class="clamp-2">{e.data.title}</b><small>Hồi {e.data.episode} · {e.data.chapterCount} chương{e.data.youtubeId ? ' · ▶ video' : ''}</small></span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <section class="panel" aria-labelledby="genre-h">
+          <h2 class="panel-title" id="genre-h">Thể loại</h2>
+          <ul class="genre-grid">{facets.map((f) => <li><a href={f.href}>{f.label}</a></li>)}</ul>
+        </section>
+      </aside>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="band-h">
+    <div class="container">
+      <span class="band-icon" aria-hidden="true"><YouTubeIcon /></span>
+      <div class="text">
+        <h2 id="band-h">Nghe Hàn Lão kể trên YouTube</h2>
+        <p>Đọc ở đây, nghe ở kênh — <b>{videos.length} hồi</b> đã có bản kể, mỗi tuần thêm hồi mới.</p>
+      </div>
+      <a class="btn" href={SITE.youtube} target="_blank" rel="noopener">Đăng ký kênh</a>
     </div>
   </section>
 </BaseLayout>

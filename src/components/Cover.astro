@@ -1,0 +1,11 @@
+---
+import { coverFor } from '../lib/media';
+interface Props { slug: string; title: string; href?: string; eager?: boolean; badge?: string; width?: number }
+const { slug, title, href, eager = false, badge } = Astro.props;
+const src = coverFor(slug);
+const Tag = href ? 'a' : 'span';
+---
+<Tag class="cover" href={href} aria-label={href ? `Xem truyện ${title}` : undefined}>
+  {src ? <img src={src} alt={`Bìa truyện ${title}`} width="600" height="900" loading={eager ? 'eager' : 'lazy'} decoding="async" fetchpriority={eager ? 'high' : undefined} /> : <span class="thumb-fallback">{title}</span>}
+  {badge && <span class="badge">{badge}</span>}
+</Tag>

@@ -3,7 +3,11 @@ import { render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import YouTubeFacade from '../../../components/YouTubeFacade.astro';
 import ReaderToolbar from '../../../components/ReaderToolbar.astro';
+import ChapterPills from '../../../components/ChapterPills.astro';
+import Thumb from '../../../components/Thumb.astro';
+import Icon from '../../../components/Icon.astro';
 import { allSeries, episodesOf, readingMinutes, type Episode, type Series } from '../../../lib/episodes';
+import { thumbFor, formatDate } from '../../../lib/media';
 import { episodePath, seriesPath, url } from '../../../lib/site';
 import '../../../styles/reader.css';
 
@@ -28,6 +32,10 @@ const chapters = headings.filter((h) => h.depth === 2);
 const minutes = readingMinutes(ep.body);
 const title = `Hồi ${d.episode}: ${d.title} — ${d.series}`;
 const pageUrl = new URL(episodePath(d.seriesSlug, d.episode), Astro.site).href;
+const img = thumbFor(d.seriesSlug, d.episode);
+const prevHref = prev ? episodePath(prev.data.seriesSlug, prev.data.episode) : null;
+const nextHref = next ? episodePath(next.data.seriesSlug, next.data.episode) : null;
+const tocHref = seriesPath(d.seriesSlug) + '#danh-sach';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Chapter',
@@ -37,11 +45,12 @@ const jsonLd = {
   description: d.summary,
   url: pageUrl,
   author: { '@type': 'Person', name: 'Hàn Lão' },
+  ...(img ? { image: new URL(img, Astro.site).href } : {}),
   isPartOf: { '@type': 'Book', name: s.data.fullTitle, url: new URL(seriesPath(d.seriesSlug), Astro.site).href },
   ...(d.youtubeId ? { video: { '@type': 'VideoObject', name: d.ytTitle ?? title, embedUrl: `https://www.youtube.com/embed/${d.youtubeId}`, thumbnailUrl: `https://i.ytimg.com/vi/${d.youtubeId}/hqdefault.jpg`, uploadDate: d.updated, description: d.summary } } : {}),
 };
 ---
-<BaseLayout title={title} description={d.summary || s.data.tagline} type="article" jsonLd={jsonLd} reader bodyClass="reader-page">
+<BaseLayout title={title} description={d.summary || s.data.tagline} image={img ?? undefined} type="article" jsonLd={jsonLd} reader bodyClass="reader-page">
   <div class="r-progress" aria-hidden="true"><span></span></div>
   <article
     class="reader"
@@ -49,25 +58,43 @@ const jsonLd = {
     data-episode={d.episode}
     data-title={d.title}
     data-url={episodePath(d.seriesSlug, d.episode)}
-    data-prev={prev ? episodePath(prev.data.seriesSlug, prev.data.episode) : ''}
-    data-next={next ? episodePath(next.data.seriesSlug, next.data.episode) : ''}
+    data-prev={prevHref ?? ''}
+    data-next={nextHref ?? ''}
   >
+    <nav class="crumbs" aria-label="Đường dẫn">
+      <a href={url('/')}>Trang chủ</a><span class="sep" aria-hidden="true">›</span>
+      <a href={seriesPath(d.seriesSlug)}>{s.data.title}</a><span class="sep" aria-hidden="true">›</span>
+      <span aria-current="page">Hồi {d.episode}</span>
+    </nav>
+
     <header class="r-head">
-      <nav class="crumbs" aria-label="Đường dẫn">
-        <a href={url('/')}>Trang chủ</a> <span aria-hidden="true">›</span>
-        <a href={seriesPath(d.seriesSlug)}>{s.data.title}</a> <span aria-hidden="true">›</span>
-        <span aria-current="page">Hồi {d.episode}</span>
-      </nav>
-      <p class="r-kicker">{s.data.fullTitle}</p>
-      <h1><span class="r-num">Hồi {d.episode}</span>{d.title}</h1>
+      <p class="r-series"><a href={seriesPath(d.seriesSlug)}>{s.data.title}</a></p>
+      <h1><span class="r-num">Hồi {d.episode}:</span> {d.title}</h1>
       <p class="r-meta">
         <span>{chapters.length} chương</span><span aria-hidden="true">·</span><span>~{minutes} phút đọc</span>
-        {d.youtubeId && <><span aria-hidden="true">·</span><span>có video</span></>}
+        {d.updated && <><span aria-hidden="true">·</span><span>Cập nhật {formatDate(d.updated)}</span></>}
       </p>
-      {d.summary && <p class="r-summary">{d.summary}</p>}
+      <ChapterPills prev={prevHref} next={nextHref} toc={tocHref} where="top" />
+      <div class="r-chips" data-reader-ui>
+        <button type="button" class="r-chip" data-open="settings"><Icon name="sliders" />Cấu hình</button>
+        <button type="button" class="r-chip" data-open="toc"><Icon name="list" />DS chương</button>
+        <button type="button" class="r-chip" data-open="scroll"><Icon name="scroll" />Tự cuộn</button>
+        <button type="button" class="r-chip" data-open="tts" hidden><Icon name="headphones" />Nghe đọc</button>
+      </div>
     </header>
 
-    {d.youtubeId && <YouTubeFacade id={d.youtubeId} title={d.ytTitle ?? title} />}
+    <section class={`r-media${d.youtubeId || img ? '' : ' no-media'}`} aria-label="Giới thiệu hồi">
+      {d.youtubeId ? (
+        <YouTubeFacade id={d.youtubeId} title={d.ytTitle ?? title} img={img} />
+      ) : img ? (
+        <figure class="r-cover"><img src={img} alt={`Ảnh hồi ${d.episode}: ${d.title}`} width="640" height="360" decoding="async" /></figure>
+      ) : null}
+      <div class="r-summary">
+        <p><b>Tóm tắt hồi {d.episode}</b></p>
+        {d.summary && <p>{d.summary}</p>}
+        {d.youtubeId && <p class="r-listen">▶ Bấm vào ảnh để nghe Hàn Lão kể hồi này (video chỉ tải từ YouTube khi bạn bấm).</p>}
+      </div>
+    </section>
 
     <details class="r-inline-toc">
       <summary>Mục lục hồi này ({chapters.length} chương)</summary>
@@ -78,26 +105,28 @@ const jsonLd = {
       <Content />
     </div>
 
-    <p class="r-end" aria-hidden="true">❦</p>
+    <p class="r-end" aria-hidden="true">— Hết hồi {d.episode} —</p>
 
-    <nav class="r-nav" aria-label="Chuyển hồi">
-      {prev ? (
-        <a class="r-nav-prev" href={episodePath(prev.data.seriesSlug, prev.data.episode)} rel="prev">
-          <small>← Hồi trước</small><span>Hồi {prev.data.episode}: {prev.data.title}</span>
-        </a>
-      ) : <span class="r-nav-prev is-disabled"><small>Đây là hồi đầu tiên</small><span>Chúc các con đọc vui</span></span>}
-      <a class="r-nav-toc" href={seriesPath(d.seriesSlug)}><small>Mục lục</small><span>{all.length} hồi</span></a>
-      {next ? (
-        <a class="r-nav-next" href={episodePath(next.data.seriesSlug, next.data.episode)} rel="next">
-          <small>Hồi sau →</small><span>Hồi {next.data.episode}: {next.data.title}</span>
-        </a>
-      ) : (
-        <span class="r-nav-next is-disabled">
-          <small>Hồi sau đang được chép</small>
-          <span>{d.nextTitle ? `Sắp tới: ${d.nextTitle}` : 'Hẹn các con hồi sau'}</span>
+    {next ? (
+      <a class="r-next" href={nextHref!}>
+        <Thumb series={next.data.seriesSlug} ep={next.data.episode} title={next.data.title} />
+        <span>
+          <small>Đọc tiếp · Hồi {next.data.episode}</small>
+          <b>{next.data.title}</b>
+          {next.data.summary && <span class="clamp-2">{next.data.summary}</span>}
         </span>
-      )}
-    </nav>
+      </a>
+    ) : (
+      <div class="r-next is-last">
+        <span>
+          <small>Hồi sau đang được chép</small>
+          <b>{d.nextTitle ? `Sắp tới: ${d.nextTitle}` : 'Hẹn các con hồi sau'}</b>
+          <span>Theo dõi kênh YouTube của Hàn Lão để biết khi có hồi mới.</span>
+        </span>
+      </div>
+    )}
+
+    <ChapterPills prev={prevHref} next={nextHref} toc={tocHref} where="bottom" />
   </article>
 
   <ReaderToolbar chapters={chapters.map((h) => ({ id: h.slug, text: h.text }))} episodes={all.map((e) => ({ n: e.data.episode, title: e.data.title, href: episodePath(e.data.seriesSlug, e.data.episode) }))} current={d.episode} seriesTitle={s.data.title} />

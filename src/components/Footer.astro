@@ -1,20 +1,45 @@
 ---
-import { SITE, url } from '../lib/site';
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import YouTubeIcon from './YouTubeIcon.astro';
+import { SITE, url, seriesPath, episodePath } from '../lib/site';
 const year = new Date().getFullYear();
 ---
 <footer class="site-footer" data-chrome>
-  <div class="container cols">
-    <div>
-      <p class="disclosure">
-        <strong>Lời thật lòng:</strong> {SITE.disclosure} Mọi nhân vật, địa danh và tình tiết đều là hư cấu.
-      </p>
-      <p>© {year} Hàn Lão Đọc Truyện · Truyện nguyên tác, vui lòng ghi nguồn khi chia sẻ.</p>
+  <div class="container foot-cols">
+    <div class="foot-brand">
+      <Logo />
+      <p>Thư phòng nhỏ của Hàn Lão — nơi chép lại trọn vẹn những truyện tiên hiệp nguyên tác để các con đọc thong thả, không quảng cáo, không cần tài khoản.</p>
+      <div class="socials">
+        <a href={SITE.youtube} target="_blank" rel="noopener" aria-label="Kênh YouTube (mở tab mới)"><YouTubeIcon /></a>
+        <a href={url('rss.xml')} aria-label="RSS"><Icon name="rss" /></a>
+      </div>
     </div>
-    <nav aria-label="Liên kết chân trang">
-      <a href={url('truyen/')}>Danh sách truyện</a>
-      <a href={url('gioi-thieu/')}>Giới thiệu</a>
-      <a href={url('rss.xml')}>RSS</a>
-      <a href={SITE.youtube} rel="noopener" target="_blank">YouTube</a>
-    </nav>
+    <div>
+      <h2>Đọc truyện</h2>
+      <ul>
+        <li><a href={seriesPath('tan-dang-ky')}>Tàn Đăng Ký</a></li>
+        <li><a href={episodePath('tan-dang-ky', 1)}>Đọc từ Hồi 1</a></li>
+        <li><a href={`${url('/')}#moi-cap-nhat`}>Mới cập nhật</a></li>
+        <li><a href={url('truyen/')}>Danh sách truyện</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Hàn Lão</h2>
+      <ul>
+        <li><a href={url('gioi-thieu/')}>Giới thiệu</a></li>
+        <li><a href={SITE.youtube} target="_blank" rel="noopener">Kênh YouTube</a></li>
+        <li><a href={url('rss.xml')}>RSS</a></li>
+        <li><a href={url('sitemap-index.xml')}>Sơ đồ trang</a></li>
+      </ul>
+    </div>
+    <div class="foot-note">
+      <h2>Minh bạch</h2>
+      <p class="disclosure"><Icon name="spark" /><span><b>Lời thật lòng:</b> {SITE.disclosure} Mọi nhân vật, địa danh và tình tiết đều là hư cấu.</span></p>
+    </div>
+  </div>
+  <div class="container foot-bottom">
+    <span>© {year} Hàn Lão Đọc Truyện · Truyện nguyên tác, vui lòng ghi nguồn khi chia sẻ.</span>
+    <span>Tuỳ chỉnh đọc và tiến độ được lưu ngay trên máy của bạn.</span>
   </div>
 </footer>
