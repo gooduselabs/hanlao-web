@@ -71,3 +71,28 @@ Include a GitHub Actions workflow for GitHub Pages deploy, but do NOT push or cr
 - Do not push to any remote
 - No secrets in files
 - Vietnamese diacritics must render correctly throughout
+
+## PRIORITY DESIGN UPDATE (mandatory — supersedes any darker default)
+
+The site must be VERY beautiful and polished.
+
+### Visual identity
+- Bright and vibrant colors by default (fresh, luminous palette). Prefer warm sunrise gradients, jade/teal and gold accents in a modern xianxia mood.
+- NOT dark/gloomy as the default theme — dark is only an optional reading mode.
+- Refined typography; subtle animations (tasteful, not distracting).
+- Beautiful cover/hero art: generate decorative SVG/CSS art if no channel images exist (no fake photos of people).
+
+### Modern reading mode (chapter page — critical)
+Provide a rich reading experience with:
+1. Multiple reading color themes: white, sepia/paper, mint green, soft blue, pink pastel, dark, night/AMOLED
+2. Font family choice (serif / sans)
+3. Font size, line height, and content width sliders
+4. Floating reading toolbar
+5. AUTO-SCROLL with play/pause and speed control; keyboard shortcuts; tap-to-pause on mobile
+6. Immersive full-screen mode
+7. Reading progress bar
+8. Remember last position (localStorage)
+9. Prev / next chapter navigation + table of contents
+10. Optional text-to-speech button using the browser Web Speech API with vi-VN voice as a bonus
+
+Persist reading preferences (theme, font, size, line height, width, scroll speed) in localStorage.

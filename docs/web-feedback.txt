@@ -1,0 +1,23 @@
+PRIORITY DESIGN FEEDBACK — apply on relaunch / next iteration
+
+The site must be VERY beautiful and polished.
+
+Visual:
+- Bright and vibrant colors (fresh, luminous palette). Warm sunrise gradients, jade/teal and gold accents, modern xianxia mood.
+- Do NOT default to dark/gloomy. Dark is an optional reading theme only.
+- Refined typography, subtle animations.
+- Beautiful cover/hero art via decorative SVG/CSS if no images (no fake people photos).
+
+Reading mode (chapter page):
+- Themes: white, sepia/paper, mint green, soft blue, pink pastel, dark, night/AMOLED
+- Font family: serif / sans
+- Sliders: font size, line height, content width
+- Floating reading toolbar
+- AUTO-SCROLL: play/pause, speed control, keyboard shortcuts, tap-to-pause on mobile
+- Immersive full-screen mode
+- Reading progress bar + remember last position (localStorage)
+- Prev/next chapter + TOC
+- Bonus: TTS button via Web Speech API (vi-VN)
+- Persist all reading prefs in localStorage
+
+Original brief remains in docs/task-web.txt (updated with this section).
