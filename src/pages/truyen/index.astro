@@ -3,7 +3,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Cover from '../../components/Cover.astro';
 import { allSeries, episodesOf } from '../../lib/episodes';
 import { SITE, seriesPath, url } from '../../lib/site';
-const list = await Promise.all((await allSeries()).map(async (s) => ({ s, n: (await episodesOf(s.data.slug)).length })));
+const list = await Promise.all(
+  (await allSeries()).map(async (s) => {
+    const eps = await episodesOf(s.data.slug);
+    return { s, n: eps.length, videos: eps.filter((e) => e.data.youtubeId).length };
+  }),
+);
 ---
 <BaseLayout title="Danh sách truyện" description="Tất cả truyện tiên hiệp nguyên tác của Hàn Lão.">
   <div class="container">
@@ -20,7 +25,7 @@ const list = await Promise.all((await allSeries()).map(async (s) => ({ s, n: (aw
         ))}
         <div class="shelf-note">
           <h2>Mỗi hồi một đêm kể chuyện</h2>
-          <p>Hiện lão đang kể <b>Tàn Đăng Ký</b>. Hồi mới được chép lên đây cùng lúc với bản kể trên kênh YouTube — theo dõi kênh hoặc RSS để không lỡ hồi nào.</p>
+          <p>Lão đã chép trọn <b>{list[0].n} hồi</b> của <b>Tàn Đăng Ký</b>; kênh YouTube hiện có bản kể cho {list[0].videos} hồi đầu — theo dõi kênh hoặc RSS để biết khi có thêm bản kể.</p>
           <p class="actions"><a class="btn btn-primary btn-sm" href={SITE.youtube} target="_blank" rel="noopener">Theo dõi kênh</a><a class="btn btn-outline btn-sm" href={url('rss.xml')}>RSS</a></p>
         </div>
       </div>

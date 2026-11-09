@@ -23,7 +23,7 @@ const subtitle = s.data.fullTitle.split('—')[1]?.trim() ?? '';
 const featured = [...videos, ...eps.filter((e) => !e.data.youtubeId)].slice(0, 6);
 const facets = [
   ...s.data.genre.map((g) => ({ label: g, href: seriesPath(slug) })),
-  { label: 'Đang ra', href: `${url('/')}#moi-cap-nhat` },
+  { label: 'Trọn bộ', href: `${url('/')}#moi-cap-nhat` },
   { label: `Có video (${videos.length})`, href: seriesPath(slug) + '#danh-sach' },
   { label: 'Truyện dài kỳ', href: seriesPath(slug) },
 ];
@@ -147,7 +147,7 @@ const jsonLd = {
       <span class="band-icon" aria-hidden="true"><YouTubeIcon /></span>
       <div class="text">
         <h2 id="band-h">Nghe Hàn Lão kể trên YouTube</h2>
-        <p>Đọc ở đây, nghe ở kênh — <b>{videos.length} hồi</b> đã có bản kể, mỗi tuần thêm hồi mới.</p>
+        <p>Bản chữ đã chép trọn <b>{eps.length} hồi</b>; kênh YouTube hiện có bản kể cho <b>{videos.length} hồi</b> đầu.</p>
       </div>
       <a class="btn" href={SITE.youtube} target="_blank" rel="noopener">Đăng ký kênh</a>
     </div>

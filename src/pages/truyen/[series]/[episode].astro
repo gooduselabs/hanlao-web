@@ -8,7 +8,7 @@ import Thumb from '../../../components/Thumb.astro';
 import Icon from '../../../components/Icon.astro';
 import { allSeries, episodesOf, readingMinutes, type Episode, type Series } from '../../../lib/episodes';
 import { thumbFor, formatDate } from '../../../lib/media';
-import { episodePath, seriesPath, url } from '../../../lib/site';
+import { SITE, episodePath, seriesPath, url } from '../../../lib/site';
 import '../../../styles/reader.css';
 
 export async function getStaticPaths() {
@@ -119,9 +119,11 @@ const jsonLd = {
     ) : (
       <div class="r-next is-last">
         <span>
-          <small>Hồi sau đang được chép</small>
-          <b>{d.nextTitle ? `Sắp tới: ${d.nextTitle}` : 'Hẹn các con hồi sau'}</b>
-          <span>Theo dõi kênh YouTube của Hàn Lão để biết khi có hồi mới.</span>
+          <small>Hết truyện</small>
+          <b>Tàn Đăng Ký đã trọn {all.length} hồi</b>
+          <span>
+            <a href={tocHref}>Xem lại mục lục</a> · <a href={episodePath(all[0].data.seriesSlug, all[0].data.episode)}>Đọc lại từ Hồi 1</a> · <a href={s.data.youtubeChannel ?? SITE.youtube} target="_blank" rel="noopener">Kênh YouTube</a>
+          </span>
         </span>
       </div>
     )}
